@@ -38,7 +38,7 @@ class App:
 
     def run(self) :
         ft.app( target = self.home )
-        # ft.app( target = home, view=ft.WEB_BROWSER ) # WEB BORWSER で起動
+        # ft.app( target = self.home, port=8550, view=ft.WEB_BROWSER ) # WEB BORWSER で起動
     
     # @classmethod
     # def run(cls) :
