@@ -65,31 +65,16 @@ class eWorks(IntEnum):
 
 class WorksPrm :
     """ 職業パラメータ class """
-    # references = {} # 作られたインスタンスを辞書型で管理する
 
-#    def __init__(self, id : eWorks, dispStr : str, factor, skills ) :
     def __init__(self, dispName : str, factor, skills ) :
         # instance vars
         self.dispName  = dispName
         self.factor    = factor
         self.skills    = skills
         
-        # WorksPrm.references[ id ] = weakref.ref( self, lambda ref: WorksPrm.references.remove(ref) )
     def __del__(self) :
         pass
     
-    # # prm = WorksPrm.getRef(id)
-    # # print( prm.dispStr)
-    # # のように使える
-    # @classmethod
-    # def getRef( cls, id ) :
-    #     _ref = cls.references[ id ]()
-    #     return _ref
-    
-    # @classmethod
-    # def getDispStr( cls, id ) :
-    #     _ref = cls.getRef(id)
-    #     return _ref.dispName
 
 class Works :
     """ 職業 class """
