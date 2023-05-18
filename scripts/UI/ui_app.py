@@ -56,7 +56,7 @@ class PageLayout(ft.UserControl):
     def __init__(self):
         super().__init__()
         # define
-        # self.containerWidth = App.page.window_width
+        self.containerWidth = App.page.window_width
         
         # init
         self.__initUiParts()
@@ -69,10 +69,13 @@ class PageLayout(ft.UserControl):
         
     def build(self):
         return ft.Container(
-            content=ft.Column([
-                ft.Row([self.personalityUi, self.playerInfoUi], alignment=ft.MainAxisAlignment.START, wrap=True)
-            ],),
+            content=ft.Column
+            (
+                [ ft.Row([self.personalityUi, self.playerInfoUi], vertical_alignment=ft.CrossAxisAlignment.START, wrap=True), ],
+            ),
             # width=self.containerWidth,
+            bgcolor=ft.colors.GREY_200,
+            border_radius=10,
         )
     
         
@@ -144,6 +147,7 @@ class PersonalityUi (ft.UserControl):
                 ft.Row( [ self.memoStr       , self.memoField       ], alignment=ft.MainAxisAlignment.CENTER ),
             ],),
             width=self.containerWidth,
+            bgcolor=ft.colors.AMBER,
         )
     
     def __initCharaName(self):
@@ -290,6 +294,7 @@ class PlayerInfoUi(ft.UserControl):
                 ft.Row( [ self.expSpace  , self.expStr    , self.expField    ], alignment=ft.MainAxisAlignment.CENTER ),
             ],),
             width=self.containerWidth,
+            bgcolor=ft.colors.YELLOW,
         )
     
     def __initPlayerName(self):
