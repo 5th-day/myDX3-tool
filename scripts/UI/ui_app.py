@@ -1,6 +1,8 @@
 # coding: UTF-8
 
+from PIL import Image
 import flet as ft
+
 from Application.character import *
 
 # ##############################################################################################3#
@@ -26,7 +28,7 @@ class App:
         page.title = "DX3 Character Maker"
         page.theme_mode = ft.ThemeMode.LIGHT
         # page.bgcolor = ft.colors.WHITE
-        page.scroll = auto
+        page.scroll = ft.ScrollMode.AUTO
         # page.window_width = 
         # page.window_height = 
         # page.theme = ft.Theme(color_scheme_seed="green")
@@ -64,14 +66,22 @@ class PageLayout(ft.UserControl):
     def __initUiParts(self) :
         # キャラクター基本情報入力枠
         self.personalityUi = PersonalityUi()
-        self.playerInfoUi = PlayerInfoUi()
+        self.playerInfoUi  = PlayerInfoUi()
+        self.lifepathUi    = LifepathUi()
         
         
     def build(self):
         return ft.Container(
             content=ft.Column
             (
-                [ ft.Row([self.personalityUi, self.playerInfoUi], vertical_alignment=ft.CrossAxisAlignment.START, wrap=True), ],
+                [ ft.Row(
+                    [
+                        self.personalityUi,
+                        ft.Column( [ self.playerInfoUi, self.lifepathUi ] )
+                    ],
+                    vertical_alignment=ft.CrossAxisAlignment.START,
+                    wrap=True
+                ), ],
             ),
             # width=self.containerWidth,
             bgcolor=ft.colors.GREY_200,
@@ -315,12 +325,128 @@ class PlayerInfoUi(ft.UserControl):
         self.expField.width = self.fieldWidth - self.itemNameWidth
         
         # callback
+        self.expField.on_blur = self.expFiledOnEdited
         
 
-    def memoFieldOnEdited(self, e):
+    def expFiledOnEdited(self, e):
         pass
         
+# ###############################################################################################
+class LifepathUi(ft.UserControl):
+    """ ライフパス情報 """
+    def __init__(self):
+        super().__init__()
+        # define
+        self.containerWidth = 500
+        self.itemNameWidth = 100
+        self.itemNameWidthSmall = 75
+        self.fieldWidth = 300
+        
+        # init
+        self.__initLifePathStr()
+        self.__initBirthPlace()
+        self.__initExperience()
+        self.__initEncount()
+        self.__initArousal()
+        self.__initImpulse()
+        self.__initErodedVal()
+        
+    def build(self):
+        return ft.Container(
+            content=ft.Column([
+                ft.Row( [self.lifepathStr]  ),
+                ft.Row( self.birthPlace.row ),
+                ft.Row( self.experience.row ),
+                ft.Row( self.encount.row    ),
+                ft.Row( self.arousal.row    ),
+                ft.Row( self.impulse.row    ),
+                ft.Row( self.erodedValRow   ),
+            ],),
+            width=self.containerWidth,
+            bgcolor=ft.colors.YELLOW,
+        )
+    
+    class LifePathItem:
+        def __init__(self, dispStr : str, itemList : list = [], callbackOnChange =  None):
+            self.dispStr = ft.Text( value = dispStr)
+            self.itemSelBox = ft.Dropdown()
 
+            self.itemSelBox.width = 400
+            
+            self.row = [ self.dispStr, self.itemSelBox ]
+
+            # list itemの登録
+            self.itemSelBox.options.append( ft.dropdown.Option( " " ) )
+            self.setItemList( itemList )
+            
+            # callback
+            self.itemSelBox.on_change = callbackOnChange
+        
+        def __del__(self):
+            pass
+        
+        def setItemList( self, itemList : list ) :
+            for item in itemList :
+                self.itemSelBox.options.append( ft.dropdown.Option( item ) )
+                
+        def clearItemList( self ):
+            self.itemSelBox.options.clear()
+            self.itemSelBox.options.append( ft.dropdown.Option( " ") )
+
+    def __initLifePathStr(self):
+        # 出自
+        self.lifepathStr = ft.Text("ライフパス")
+        # callback
+        
+    def __initBirthPlace(self):
+        # 出自
+        self.birthPlace = self.LifePathItem("出自", callbackOnChange=self.birthPaceOnChanged)
+        # callback
+        
+    def __initExperience(self):
+        # 経験
+        self.experience = self.LifePathItem("経験", callbackOnChange=self.experienceOnChanged)
+        # callback
+        
+    def __initEncount(self):
+        # 邂逅
+        self.encount = self.LifePathItem("邂逅", callbackOnChange=self.encountOnChanged)
+        # callback
+        
+    def __initArousal(self):
+        # 覚醒
+        self.arousal = self.LifePathItem("覚醒", callbackOnChange=self.arousalOnChanged)
+        # callback
+        
+    def __initImpulse(self):
+        # 衝動
+        self.impulse = self.LifePathItem("衝動", callbackOnChange=self.impulseOnChanged)
+        # callback
+        
+    def __initErodedVal(self):
+        # 侵食率基礎値
+        self.erodedValSpace = ft.Text( "" )
+        self.erodedValStr = ft.Text( "侵食率基礎値" )
+        self.erodedValField = ft.TextField( value=0, disabled=True)
+        
+        self.erodedValRow = [ self.erodedValSpace, self.erodedValStr, self.erodedValField ]
+        
+    def birthPaceOnChanged(self, e):
+        pass
+        
+    def experienceOnChanged(self, e):
+        pass
+        
+    def encountOnChanged(self, e):
+        pass
+        
+    def arousalOnChanged(self, e):
+        pass
+        
+    def impulseOnChanged(self, e):
+        pass
+        
+# ###############################################################################################
 def run():
     app = App()
     app.run()
