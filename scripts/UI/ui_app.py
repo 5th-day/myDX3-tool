@@ -1,6 +1,6 @@
 # coding: UTF-8
 
-from PIL import Image
+# from PIL import Image
 import flet as ft
 
 from Application.character import *
@@ -11,16 +11,13 @@ class App:
     page = None
     
     def __init__(self) :
+        self.assetsDir = "assets"
+        
         self.character = DX3Character()
         
     def __del__(self) :
         pass
 
-    def __initUiParts(self) :
-        # キャラクター基本情報入力枠
-        self.personalityUi = PersonalityUi()
-        self.playerInfoUi = PlayerInfoUi()
-        
     def home(self, page: ft.Page) :
         App.page = page # クラス変数として管理
         
@@ -48,7 +45,7 @@ class App:
         page.update()
 
     def run(self) :
-        ft.app( target = self.home )
+        ft.app( target = self.home, assets_dir=self.assetsDir )
         # ft.app( target = self.home, port=8550, view=ft.WEB_BROWSER ) # WEB BORWSER で起動
         
 
@@ -68,6 +65,8 @@ class PageLayout(ft.UserControl):
         self.personalityUi = PersonalityUi()
         self.playerInfoUi  = PlayerInfoUi()
         self.lifepathUi    = LifepathUi()
+        self.appearanceUi  = AppearanceUi()
+        self.basicPointsUi = BasicPointsUi()
         
         
     def build(self):
@@ -77,10 +76,21 @@ class PageLayout(ft.UserControl):
                 [ ft.Row(
                     [
                         self.personalityUi,
-                        ft.Column( [ self.playerInfoUi, self.lifepathUi ] )
+                        ft.Column(
+                            [
+                                ft.Row(
+                                    [
+                                        ft.Column( [ self.playerInfoUi, self.lifepathUi ] ),
+                                        self.appearanceUi,
+                                    ],
+                                    vertical_alignment=ft.CrossAxisAlignment.START
+                                ),
+                                self.basicPointsUi
+                            ],
+                        ),
                     ],
                     vertical_alignment=ft.CrossAxisAlignment.START,
-                    wrap=True
+                    wrap=True,
                 ), ],
             ),
             # width=self.containerWidth,
@@ -447,6 +457,179 @@ class LifepathUi(ft.UserControl):
         pass
         
 # ###############################################################################################
+class AppearanceUi(ft.UserControl):
+    """ キャラクターアイコン """
+    def __init__(self):
+        super().__init__()
+        # define
+        self.containerWidth = 200
+        self.imgWidth = self.containerWidth
+        self.imgHeight = self.imgWidth
+        
+        # init
+        self.__initAppearanceStr()
+        self.__initAppearanceImage()
+        
+    def build(self):
+        return ft.Container(
+            content=ft.Column([
+                self.str,
+                self.imgFrame
+            ],),
+            width=self.containerWidth,
+            bgcolor=ft.colors.YELLOW,
+        )
+    
+    def __initAppearanceStr(self):
+        self.str = ft.Text("外見")
+
+    def __initAppearanceImage(self):
+        self.img = ft.Image(
+            src=f"/images/person.svg",
+            width=self.imgWidth, height=self.imgHeight,
+            color=ft.colors.GREY_600,
+            fit=ft.ImageFit.FIT_WIDTH,
+            border_radius=10,
+        )
+        
+        self.imgFrame = ft.Container(
+            self.img,
+            bgcolor=ft.colors.AMBER_100,
+        )
+        self.imgFrame.on_click = self.appearanceOnClicked
+        
+        # 画像ファイルPicker　Instance
+        # openFilePicker()の度にインスタンスを生成すると都度appendすることになるのでここで生成しておく
+        self.pickFileDialog = ft.FilePicker(on_result=self.filePickerOnResult)
+        App.page.overlay.append( self.pickFileDialog )
+        
+    def appearanceOnClicked(self,e):
+        self.openFilePicker()
+    
+    def openFilePicker(self):
+        self.pickFileDialog.pick_files(file_type=ft.FilePickerFileType.IMAGE)
+        
+    def filePickerOnResult(self, e : ft.FilePickerResultEvent):
+        if e.files is None:
+            print("canceled")
+            return
+        self.setImage(e.files[0].path)
+    
+    def setImage(self, path: str = None, data = None):
+        if path is not None:
+            self.img.src = path
+        elif data is not None:
+            # Image Object ->　ft.Image
+            pass
+        else :
+            return
+        
+        self.img.color = None
+        self.img.update()
+        
+# ###############################################################################################
+class BasicPointsUi(ft.UserControl):
+    """ HP最大値など """
+    def __init__(self):
+        super().__init__()
+        # define
+        self.containerWidth = 500
+        
+        # init
+        self.__initMaxHpUi()
+        self.__initRegularStockUi()
+        self.__initBattleMoveUi()
+        self.__initMovePointUi()
+        self.__initWalletPointUi()
+        self.__initFullPowerMoveUi()
+        
+    def build(self):
+        return ft.Container(
+            content=ft.Column([
+                ft.Row(
+                    [
+                        self.maxHpUi,
+                        self.regularStockUi,
+                        self.BattleMoveUi,
+                    ],
+                ),
+                ft.Row(
+                    [
+                        self.movePointUi,
+                        self.walletPointUi,
+                        self.fullPowerUi,
+                    ],
+                ),
+            ],),
+            width=self.containerWidth,
+            bgcolor=ft.colors.YELLOW,
+        )
+    
+    def __initMaxHpUi(self):
+        self.maxHpUi = BasicPointsItem("外見","肉体","精神" )
+
+    def __initRegularStockUi(self):
+        self.regularStockUi = BasicPointsItem("常備化P","社会","調達" )
+    
+    def __initBattleMoveUi(self):
+        self.BattleMoveUi = BasicPointsItem("戦闘移動","行動地",None )
+    
+    def __initMovePointUi(self):
+        self.movePointUi = BasicPointsItem("行動値","感覚","精神" )
+    
+    def __initWalletPointUi(self):
+        self.walletPointUi = BasicPointsItem("財産P","常備化P","使用P" )
+    
+    def __initFullPowerMoveUi(self):
+        self.fullPowerUi = BasicPointsItem("全力移動","戦闘移動",None )
+    
+class BasicPointsItem(ft.UserControl):
+    """ HP最大値など """
+    def __init__(self, dispStr : str, prm1str : str, prm2str : str = None, ):
+        super().__init__()
+        # define
+        self.prmWidth = 50
+        
+        # vars
+        self.dispStr = ft.Text( value = dispStr )
+        self.prm1Str = ft.Text( value = prm1str )
+        self.prm1Field  = ft.TextField( value=0, read_only=True )
+        
+        self.existPrm2 = False if prm2str is None else True
+        
+        self.prm2Str = ft.Text( value = prm2str )
+        self.prm2Field  = ft.TextField( value=0, read_only=True )
+        
+        self.total = ft.TextField( value=0, read_only=True )
+        self.total.width = self.prmWidth
+
+        # callback
+    
+    def build(self):
+        prm1Frame = ft.Column([ self.prm1Str, self.prm1Field ], width=self.prmWidth )
+        prm2Frame = ft.Column([ self.prm2Str, self.prm2Field ], width=self.prmWidth )
+        
+        prmList = [ prm1Frame ]
+        
+        if self.existPrm2 :
+            prmList.append( prm2Frame )
+        
+        return ft.Container(
+            ft.Column([
+                ft.Row( [
+                    ft.Column( [
+                        self.dispStr,
+                        ft.Row(prmList),
+                    ], ),
+                    self.total,
+                ], )
+            ], ),
+            bgcolor=ft.colors.BLUE_50,
+        )
+
+    
+# ###############################################################################################
+
 def run():
     app = App()
     app.run()
