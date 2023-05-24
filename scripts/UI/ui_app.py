@@ -10,10 +10,12 @@ class App:
     """ Fletを使ってGUIアプリケーション全体を管理するclass """
     page = None
     
+    character : DX3Character = None
+    
     def __init__(self) :
         self.assetsDir = "assets"
         
-        self.character = DX3Character()
+        App.character = DX3Character()
         
     def __del__(self) :
         pass
@@ -67,31 +69,59 @@ class PageLayout(ft.UserControl):
         self.lifepathUi    = LifepathUi()
         self.appearanceUi  = AppearanceUi()
         self.basicPointsUi = BasicPointsUi()
+        self.abilityUi     = AbilityUi()
+        self.bleedUi       = BleedUi()
+        self.syndromeUi    = SyndromeUi()
         
         
     def build(self):
         return ft.Container(
-            content=ft.Column
-            (
-                [ ft.Row(
-                    [
-                        self.personalityUi,
-                        ft.Column(
-                            [
-                                ft.Row(
-                                    [
-                                        ft.Column( [ self.playerInfoUi, self.lifepathUi ] ),
-                                        self.appearanceUi,
-                                    ],
-                                    vertical_alignment=ft.CrossAxisAlignment.START
-                                ),
-                                self.basicPointsUi
-                            ],
-                        ),
-                    ],
-                    vertical_alignment=ft.CrossAxisAlignment.START,
-                    wrap=True,
-                ), ],
+            content=ft.Row(
+                [
+                    ft.Column
+                    (
+                        [
+                            ft.Row(
+                                [
+                                    self.personalityUi,
+                                    ft.Column(
+                                        [
+                                            ft.Row(
+                                                [
+                                                    ft.Column( [ self.playerInfoUi, self.lifepathUi ] ),
+                                                    self.appearanceUi,
+                                                ],
+                                                vertical_alignment=ft.CrossAxisAlignment.START
+                                            ),
+                                            self.basicPointsUi
+                                        ],
+                                    ),
+                                ],
+                                vertical_alignment=ft.CrossAxisAlignment.START,
+                                wrap=True,
+                            ),
+                            self.abilityUi,
+                        ],
+                        wrap = True,
+                        # expand=1
+                    ),
+                    ft.Column
+                    (
+                        [
+                            ft.Row(
+                                [
+                                    self.bleedUi,
+                                    self.syndromeUi,
+                                ],
+                                vertical_alignment=ft.CrossAxisAlignment.START,
+                            )
+                        ],
+                        # expand=1
+                    ),
+                ],
+                vertical_alignment=ft.CrossAxisAlignment.START,
+                # 暫定的に画面全体を小さく表示して実装するために scale セット
+                scale=0.60
             ),
             # width=self.containerWidth,
             bgcolor=ft.colors.GREY_200,
@@ -102,7 +132,7 @@ class PageLayout(ft.UserControl):
     
 # ##############################################################################################3#
 class PersonalityUi (ft.UserControl):
-    """ sample """
+    """ キャラクターの個人情報・人格に関する情報 """
     def __init__(self):
         super().__init__()
         # define
@@ -197,7 +227,7 @@ class PersonalityUi (ft.UserControl):
         # list itemの登録
         self.worksSelBox.options.append( ft.dropdown.Option( " " ) )
         for id in eWorks :
-            self.worksSelBox.options.append( ft.dropdown.Option( Works.getDispName(id) ) )
+            self.worksSelBox.options.append( ft.dropdown.Option( key=id, text=Works.getDispName(id) ) )
         
         # callback
         
@@ -211,7 +241,7 @@ class PersonalityUi (ft.UserControl):
         # list itemの登録
         self.coverSelBox.options.append( ft.dropdown.Option( " " ) )
         for id in eWorks :
-            self.coverSelBox.options.append( ft.dropdown.Option( Works.getDispName(id) ) )
+            self.coverSelBox.options.append( ft.dropdown.Option( key=id, text=Works.getDispName(id) ) )
         self.coverSelBox.options.append( ft.dropdown.Option( "その他" ) )
         
         # callback
@@ -248,6 +278,7 @@ class PersonalityUi (ft.UserControl):
         self.bodyHeightField.width = self.itemNameWidthSmall
         
         # callback
+        self.bodyHeightField.on_blur = self.heightOnEdit
         
     def __initBodyWeight(self) :
         # 体重
@@ -276,7 +307,6 @@ class PersonalityUi (ft.UserControl):
         self.memoField.min_lines = 3
         self.memoField.max_lines = 3
 
-        
         # callback
         self.memoField.on_blur   = self.memoFieldOnEdited
         # self.memoField.on_submit = self.memoFieldEdited
@@ -288,6 +318,9 @@ class PersonalityUi (ft.UserControl):
         else:
             pass
         App.page.update()
+    
+    def heightOnEdit(self, e):
+        pass
     
     def memoFieldOnEdited(self, e):
         pass
@@ -529,7 +562,7 @@ class AppearanceUi(ft.UserControl):
         
 # ###############################################################################################
 class BasicPointsUi(ft.UserControl):
-    """ HP最大値など """
+    """ 副能力値 HP最大値など """
     def __init__(self):
         super().__init__()
         # define
@@ -572,7 +605,7 @@ class BasicPointsUi(ft.UserControl):
         self.regularStockUi = BasicPointsItem("常備化P","社会","調達" )
     
     def __initBattleMoveUi(self):
-        self.BattleMoveUi = BasicPointsItem("戦闘移動","行動地",None )
+        self.BattleMoveUi = BasicPointsItem("戦闘移動","行動値",None )
     
     def __initMovePointUi(self):
         self.movePointUi = BasicPointsItem("行動値","感覚","精神" )
@@ -627,7 +660,160 @@ class BasicPointsItem(ft.UserControl):
             bgcolor=ft.colors.BLUE_50,
         )
 
+# ###############################################################################################
+class AbilityUi(ft.UserControl):
+    """ 能力値 """
+    def __init__(self):
+        super().__init__()
+        # define
+        self.containerWidth = 1000
+        
+        # init
+        self.__initAbilityStr()
+        self.__initBodyUi()
+        self.__initSenseUi()
+        self.__initMentalUi()
+        self.__initSocialityUi()
+        
+    def build(self):
+        return ft.Container(
+            content=ft.Column([
+                self.abilityStr,
+                ft.Row(
+                    [
+                        # self.bodyUi,
+                        # self.senseUi,
+                        # self.mentalUi,
+                        # self.socialityUi
+                    ],
+                ),
+            ],),
+            width=self.containerWidth,
+            bgcolor=ft.colors.YELLOW,
+        )
     
+    def __initAbilityStr(self):
+        self.abilityStr = ft.Text("能力値", bgcolor=ft.colors.GREY_100)
+
+    def __initBodyUi(self):
+        self.bodyUi = abilityItemUi()
+
+    def __initSenseUi(self):
+        self.senseUi = abilityItemUi()
+    
+    def __initMentalUi(self):
+        self.mentalUi = abilityItemUi()
+    
+    def __initSocialityUi(self):
+        self.socialityUi = abilityItemUi()
+    
+class abilityItemUi(ft.UserControl):
+    """ 技能パラメータ """
+    def __init__(self, ):
+        super().__init__()
+        # define
+        
+        # vars
+
+        # callback
+    
+    def build(self):
+        pass
+    
+
+# ###############################################################################################
+class BleedUi(ft.UserControl):
+    """ ブリード """
+    def __init__(self):
+        super().__init__()
+        # define
+        self.containerWidth = 250
+        
+        # init
+        self.__initBleedStr()
+        self.__initBleedSelBox()
+        
+    def build(self):
+        return ft.Container(
+            content=ft.Column([
+                        self.bleedStr,
+                        self.bleedSelBox,
+            ],),
+            width=self.containerWidth,
+            bgcolor=ft.colors.ORANGE,
+        )
+    
+    def __initBleedStr(self):
+        self.bleedStr = ft.Text("ブリード")
+
+    def __initBleedSelBox(self):
+        self.bleedSelBox = ft.Dropdown()
+        
+        self.bleedSelBox.options.append( ft.dropdown.Option(" "))
+    
+class SyndromeUi(ft.UserControl):
+    """ シンドローム """
+    def __init__(self, ):
+        super().__init__()
+        # define
+        
+        # init
+        self.__initSyndromeStr()
+        self.__initSyndromItems()
+
+        # callback
+    
+    def build(self):
+        return ft.Container( 
+            content=ft.Column(
+                [
+                    self.syndromeStr,
+                    ft.Row(
+                        self.syndromeItems,
+                    ),
+                ],
+            ),
+            # width=self.containerWidth,
+            bgcolor=ft.colors.YELLOW,
+        )
+    
+    def __initSyndromeStr(self):
+        self.syndromeStr = ft.Text("シンドローム")
+        
+    def __initSyndromItems(self):
+        self.syndromeItem1 = SyndromeItem()
+        self.syndromeItem2 = SyndromeItem()
+        self.syndromeItem3 = SyndromeItem()
+        
+        self.syndromeItem3.selBox.label = "optional"
+        
+        self.syndromeItems = [
+                self.syndromeItem1,
+                self.syndromeItem2,
+                self.syndromeItem3,
+            ]
+        
+class SyndromeItem(ft.UserControl):
+    """ シンドローム """
+    def __init__(self):
+        super().__init__()
+        # define
+        
+        # init
+        self.__initSyndromeItem()
+
+        # callback
+    
+    def build(self):
+        return self.selBox
+    
+    def __initSyndromeItem(self):
+        self.selBox = ft.Dropdown()
+        
+        self.selBox.options.append(ft.dropdown.Option(" ") )
+        
+    
+
 # ###############################################################################################
 
 def run():
