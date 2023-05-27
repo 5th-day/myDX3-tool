@@ -3,6 +3,7 @@
 from typing import Callable
 
 class State:
+    """ Stateクラス value変更時にobserverに登録されたコールバックに通知を行う """
     def __init__(self, value):
         self.__value = value
         self.__observer = Observer()
@@ -21,6 +22,10 @@ class State:
         self.__observer.bind(callback)
 
 class Observer:
+    """ Observerクラス
+        bind()   : コールバックの登録
+        notify() : 登録されたコールバックの呼び出し
+    """
     def __init__(self):
         self.__observers = []
         
