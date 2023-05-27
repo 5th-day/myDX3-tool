@@ -1,32 +1,75 @@
 # coding: UTF-8
 
+from typing import Callable
+from .state import State, Observer
 from .character_attributes import *
 
-# class DX3Character(Personality, LifePath) 継承で持つか変数として持つか。。。
 class DX3Character(object):
-    """ Double Cross v3 character class """
+    """ Double Cross v3 character class
+        パラメータが変更されたとき影響を受ける他のパラメータを更新できるようにAPI経由でアクセスする
+        setXxxx()  : パラメータの変更
+        getXxxx()  : パラメータの取得
+        bind()     : パラメータが変更されたときに通知を受けるコールバックの登録
+    """
     def __init__(self) :
         # instance vars
-        personality = Personality()
-        lifepath    = LifePath()
-        lois        = Lois()
+        self.__prm    = DX3CharacterData()
+        self.__observers = self.Observer()
+
+    def __del__(self) :
+        pass
+    
+    # Character Name
+    def setCharacterName(self, str: str):
+        # set prm
+        self.__prm.personality.name = str
+        # notify prm change
+        self.__observers.characterName.notify()
+        
+    def getCharacterName(self) -> str :
+        return self.__prm.personality.name
+
+    def bindCharaName(self, callback: Callable[ [], None ]) -> None :
+        self.__observers.characterName.bind(callback)
+        pass
+    
+    # ###################################################################
+    class Observer(object):
+        """ parameter on change callback class """
+        def __init__(self) :
+            # instance vars
+            self.characterName = Observer()
+
+        def __del__(self) :
+            pass
+        
+# ################################################################################################
+class DX3CharacterData(object):
+    """ Double Cross v3 character data class """
+    def __init__(self) :
+        # instance vars
+        self.personality = Personality()
+        self.lifepath    = LifePath()
+        self.lois        = Lois()
 
     def __del__(self) :
         pass
 
+    
 class Personality(object):
     """ Personal data class """
     def __init__(self) :
         # instance vars
         self.name            = ""
-        self.code_name       = ""
+        self.codeName        = ""
         self.works : eWorks  = 0
-        self.cover           = 0
+        self.cover           = ""
         self.age             = 0
         self.gender          = 0
-        self.zodiac_sign     = "" # 星座
+        self.zodiacSign      = "" # 星座
         self.height          = 0
         self.weight          = 0
+        self.bloodType       = 0
         self.memo            = ""
         self.playerName      = ""
         self.playerExp       = 0

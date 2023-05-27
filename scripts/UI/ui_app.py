@@ -48,7 +48,7 @@ class App:
 
     def run(self) :
         ft.app( target = self.home, assets_dir=self.assetsDir )
-        # ft.app( target = self.home, port=8550, view=ft.WEB_BROWSER ) # WEB BORWSER で起動
+        # ft.app( target = self.home, assets_dir=self.assetsDir, view=ft.WEB_BROWSER ) # WEB BORWSER で起動
         
 
 # ##############################################################################################3#
@@ -120,8 +120,9 @@ class PageLayout(ft.UserControl):
                     ),
                 ],
                 vertical_alignment=ft.CrossAxisAlignment.START,
+                scroll = ft.ScrollMode.AUTO,
                 # 暫定的に画面全体を小さく表示して実装するために scale セット
-                scale=0.60
+                # scale=0.60,
             ),
             # width=self.containerWidth,
             bgcolor=ft.colors.GREY_200,
@@ -203,11 +204,12 @@ class PersonalityUi (ft.UserControl):
     def __initCharaName(self):
         # キャラクター名
         self.charaNameStr = ft.Text( value="氏名", width=self.itemNameWidth, )
-        self.charaNameField = ft.TextField()
+        self.charaNameField = ft.TextField( value=App.character.getCharacterName() )
         self.charaNameField.width = self.fieldWidth
         
+        App.character.bindCharaName( self.updateCharaName )
         # callback
-        self.charaNameField.on_blur = ""
+        self.charaNameField.on_blur = lambda e : App.character.setCharacterName(e.control.value)
         
     def __initCodeName(self):
         # コードネーム
@@ -311,7 +313,10 @@ class PersonalityUi (ft.UserControl):
         self.memoField.on_blur   = self.memoFieldOnEdited
         # self.memoField.on_submit = self.memoFieldEdited
         
-       
+    def updateCharaName(self):
+        self.charaNameField.value = App.character.getCharacterName()
+        self.charaNameField.update()
+    
     def coverOnChange(self, e):
         if ( self.coverSelBox.value == "その他" ):
             pass
@@ -681,10 +686,10 @@ class AbilityUi(ft.UserControl):
                 self.abilityStr,
                 ft.Row(
                     [
-                        # self.bodyUi,
-                        # self.senseUi,
-                        # self.mentalUi,
-                        # self.socialityUi
+                        self.bodyUi,
+                        self.senseUi,
+                        self.mentalUi,
+                        self.socialityUi
                     ],
                 ),
             ],),
@@ -696,30 +701,149 @@ class AbilityUi(ft.UserControl):
         self.abilityStr = ft.Text("能力値", bgcolor=ft.colors.GREY_100)
 
     def __initBodyUi(self):
-        self.bodyUi = abilityItemUi()
+        self.bodyUi = AbilityBodyUi()
 
     def __initSenseUi(self):
-        self.senseUi = abilityItemUi()
+        self.senseUi = AbilitySenseUi()
     
     def __initMentalUi(self):
-        self.mentalUi = abilityItemUi()
+        self.mentalUi = AbilityMentalUi()
     
     def __initSocialityUi(self):
-        self.socialityUi = abilityItemUi()
+        self.socialityUi = AbilitySocialityUi()
     
-class abilityItemUi(ft.UserControl):
+class AbilityItemUi(ft.UserControl):
     """ 技能パラメータ """
-    def __init__(self, ):
+    def __init__(self, abilityStr: str, ):
+        super().__init__()
+        # define
+        self.containerWidth = 250
+        self.pointWidth = 60
+        # vars
+        self.abilityStr     = abilityStr
+        self.abilityPoint   = 0
+        self.freePointSpace = ""
+        self.freePoint      = 0
+        self.skillList      = []
+        
+        self.abilityStrText    = ft.Text( self.abilityStr )
+        self.abilityPointField = ft.TextField( value=self.abilityPoint, width=self.pointWidth ,read_only=True )
+        self.freePointSpace    = ft.Text( self.freePointSpace,)
+        self.freePointField    = ft.TextField( value=self.freePoint, width=self.pointWidth, label="成長P")
+        
+        # callback
+    
+    def build(self):
+        return ft.Container(
+            content=ft.Column(
+                [
+                    ft.Row
+                    (
+                        [
+                            self.abilityStrText,
+                            self.abilityPointField,
+                            ft.Column(
+                                [
+                                    self.freePointSpace,
+                                    self.freePointField,
+                                ]
+                            )
+                        ]
+                    ),
+                    ft.Column(self.skillList),
+                ]
+            ),
+            width=self.containerWidth,
+        )
+    
+    
+class AbilityBodyUi(AbilityItemUi):
+    """ 肉体UI """
+    def __init__(self):
+        super().__init__(abilityStr = "肉体")
+        # define
+        
+        # vars
+        self.skillList.append( SkillItemUi("白兵") )
+        self.skillList.append( SkillItemUi("回避") )
+        self.skillList.append( SkillItemUi("運転", hasTextField=True) )
+
+        # callback
+    
+class AbilitySenseUi(AbilityItemUi):
+    """ 感覚UI """
+    def __init__(self):
+        super().__init__(abilityStr = "感覚")
+        # define
+        
+        # vars
+        self.skillList.append( SkillItemUi("射撃") )
+        self.skillList.append( SkillItemUi("知覚") )
+        self.skillList.append( SkillItemUi("芸術", hasTextField=True) )
+
+        # callback
+    
+class AbilityMentalUi(AbilityItemUi):
+    """ 精神UI """
+    def __init__(self):
+        super().__init__(abilityStr = "精神")
+        # define
+        
+        # vars
+        self.skillList.append( SkillItemUi("RC") )
+        self.skillList.append( SkillItemUi("意志") )
+        self.skillList.append( SkillItemUi("知識", hasTextField=True) )
+
+        # callback
+    
+class AbilitySocialityUi(AbilityItemUi):
+    """ 社会UI """
+    def __init__(self):
+        super().__init__(abilityStr = "社会")
+        # define
+        
+        # vars
+        self.skillList.append( SkillItemUi("交渉") )
+        self.skillList.append( SkillItemUi("調達") )
+        self.skillList.append( SkillItemUi("情報", hasTextField=True) )
+
+        # callback
+    
+
+class SkillItemUi(ft.UserControl):
+    """ 技能パラメータ """
+    def __init__(self, str : str, hasTextField : bool = False, ):
         super().__init__()
         # define
         
         # vars
-
+        self.str          = str
+        self.level        = 0
+        self.freePoint    = 0
+        self.hasTextField = hasTextField
+        
+        self.strText        = ft.Text(self.str)
+        self.levelField     = ft.TextField(value=0, keyboard_type=ft.KeyboardType.NUMBER, read_only=True, suffix_text="Lv")
+        self.freePointField = ft.TextField(value=0, keyboard_type=ft.KeyboardType.NUMBER, suffix_text="P", label="成長P")
+        
+        self.specificField   = ft.TextField(value="")
+        
         # callback
     
     def build(self):
-        pass
-    
+        if self.hasTextField :
+            row = [self.strText, self.specificField, self.freePointField, self.levelField ]
+            # 一旦適当な幅で調整しておく
+            self.strText.width = self.specificField.width= 50
+        else :
+            row = [self.strText, self.freePointField, self.levelField ]
+            # 一旦適当な幅で調整しておく
+            self.strText.width = 100
+            
+        # 一旦適当な幅で調整しておく
+        self.levelField.width = self.freePointField.width = 60
+        return ft.Row( row )
+         
 
 # ###############################################################################################
 class BleedUi(ft.UserControl):
