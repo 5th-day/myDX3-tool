@@ -207,7 +207,8 @@ class PersonalityUi (ft.UserControl):
         self.charaNameField = ft.TextField( value=App.character.getCharacterName() )
         self.charaNameField.width = self.fieldWidth
         
-        App.character.bindCharaName( self.updateCharaName )
+        # observerに登録
+        App.character.bind( id = ePrmId.charName, callback=self.updateCharaName )
         # callback
         self.charaNameField.on_blur = lambda e : App.character.setCharacterName(e.control.value)
         
@@ -693,7 +694,7 @@ class AbilityUi(ft.UserControl):
                     ],
                 ),
             ],),
-            width=self.containerWidth,
+            # width=self.containerWidth,
             bgcolor=ft.colors.YELLOW,
         )
     
@@ -747,11 +748,11 @@ class AbilityItemUi(ft.UserControl):
                                     self.freePointSpace,
                                     self.freePointField,
                                 ]
-                            )
-                        ]
+                            ),
+                        ],
                     ),
                     ft.Column(self.skillList),
-                ]
+                ],
             ),
             width=self.containerWidth,
         )

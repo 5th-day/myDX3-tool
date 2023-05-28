@@ -14,34 +14,28 @@ class DX3Character(object):
     def __init__(self) :
         # instance vars
         self.__prm    = DX3CharacterData()
-        self.__observers = self.Observer()
+        # 辞書型でObserverを管理する
+        self.__observers: dict[ePrmId, Observer] = {}
+        
+        for id in ePrmId :
+            self.__observers[id] = Observer()
 
     def __del__(self) :
         pass
     
+    def bind(self, id : ePrmId, callback : Callable[ [], None ]) -> None :
+        self.__observers[id].bind(callback)
+        
     # Character Name
-    def setCharacterName(self, str: str):
+    def setCharacterName(self, str: str) -> None:
         # set prm
         self.__prm.personality.name = str
         # notify prm change
-        self.__observers.characterName.notify()
+        self.__observers[ePrmId.charName].notify()
         
     def getCharacterName(self) -> str :
         return self.__prm.personality.name
 
-    def bindCharaName(self, callback: Callable[ [], None ]) -> None :
-        self.__observers.characterName.bind(callback)
-        pass
-    
-    # ###################################################################
-    class Observer(object):
-        """ parameter on change callback class """
-        def __init__(self) :
-            # instance vars
-            self.characterName = Observer()
-
-        def __del__(self) :
-            pass
         
 # ################################################################################################
 class DX3CharacterData(object):

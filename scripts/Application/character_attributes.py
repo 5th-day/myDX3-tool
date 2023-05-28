@@ -4,6 +4,52 @@ import weakref
 from enum import IntEnum, auto, unique
 
 # ################################################################################################
+# パラメータID
+# ################################################################################################
+@unique
+class ePrmId(IntEnum):
+    charName              = auto()
+    codeName              = auto()
+    works                 = auto()
+    cover                 = auto()
+    age                   = auto()
+    gender                = auto()
+    zodiacSign            = auto()
+    bodyHeight            = auto()
+    bodyWeight            = auto()
+    bloodType             = auto()
+    memo                  = auto()
+    playerName            = auto()
+    playerExp             = auto()
+    birthPlace            = auto()
+    experience            = auto()
+    encount               = auto()
+    arousal               = auto()
+    impulse               = auto()
+    erodedVal             = auto()
+    appearance            = auto()
+    maxHp                 = auto()
+    regularStock          = auto()
+    battleMove            = auto()
+    movePoint             = auto()
+    walletPoint           = auto()
+    fullPowerMove         = auto()
+    bodyPoint             = auto()
+    sensePoint            = auto()
+    mentalPoint           = auto()
+    socialityPoint        = auto()
+    bodySkillPoint        = auto()
+    senseSkillPoint       = auto()
+    mentalSkillPoint      = auto()
+    socialitySkillPoint   = auto()
+    bleed                 = auto()
+    syndrome1             = auto()
+    syndrome2             = auto()
+    optionalSyndrome      = auto()
+    effect                = auto()
+    combo                 = auto()
+
+# ################################################################################################
 # ワークス
 # ################################################################################################
 @unique
