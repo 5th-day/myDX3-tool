@@ -519,3 +519,284 @@ class UgnExperience :
     def getRecommendedLois( cls, id : eUgnExperience ) -> str:
         return cls.prm[id].recommendedLois
 
+# ################################################################################################
+# 邂逅
+# ################################################################################################
+class Encount:
+    """ 邂逅クラス """
+    dict = {
+        "自身"      : "敷島あやめ"                      ,
+        "師匠"      : "玉野椿"                          ,
+        "保護者"    : "霧谷雄吾"                        ,
+        "恩人"      : "テレーズ・ブルム"                ,
+        "主人"      : "霧谷雄吾"                        ,
+        "借り"      : "ヨハン・C・コードウェル"         ,
+        "いいひと"  : "谷修成"                          ,
+        "家族"     : "神城早月"                         ,
+        "友人"     : "敷島あやめ"                       ,
+        "同志"     : "テレーズ・ブルム"                 ,
+        "ビジネス" : "神城早月"                         ,
+        "同行者"   : "玉野椿"                           ,
+        "忘却"     : "アルフレッド・J・コードウェル"    ,
+        "慕情"     : "姫宮由里香"                       ,
+        "貸し"     : "猫川美亜"                         ,
+        "幼子"     : "テレーズ・ブルム"                 ,
+        "腐れ縁"   : "春日恭二"                         ,
+        "秘密"     : "ローザ・バスカヴィル"             ,
+        "好敵手"   : "黒崎剛道"                         ,
+        "殺意"     : "伊庭宗一"                         ,
+    }
+
+# ################################################################################################
+# 覚醒
+# ################################################################################################
+@unique
+class eArousal(IntEnum):
+    death           = auto() # 死
+    anger           = auto() # 憤怒
+    prime           = auto() # 素体
+    infection       = auto() # 感染
+    craving         = auto() # 渇望
+    ignorance       = auto() # 無知
+    sacrifice       = auto() # 犠牲
+    order           = auto() # 命令
+    forcedObles     = auto() # 忘却
+    exploration     = auto() # 探求
+    compensastion   = auto() # 償い
+    birth           = auto() # 生誕
+
+class ArousalPrm :
+    """ 覚醒パラメータ class """
+    def __init__(self, dispName : str, arousalValue : int ) :
+        # instance vars
+        self.dispName  = dispName
+        self.arousalVal = arousalValue
+    def __del__(self) :
+        pass
+    
+
+class Arousal :
+    """ 覚醒 class """
+    # IDとパラメータを辞書型で管理する
+    prm = {
+        eArousal.death           : ArousalPrm(dispName="死"  , arousalValue=18 ),
+        eArousal.anger           : ArousalPrm(dispName="憤怒", arousalValue=17 ),
+        eArousal.prime           : ArousalPrm(dispName="素体", arousalValue=16 ),
+        eArousal.infection       : ArousalPrm(dispName="感染", arousalValue=14 ),
+        eArousal.craving         : ArousalPrm(dispName="渇望", arousalValue=17 ),
+        eArousal.ignorance       : ArousalPrm(dispName="無知", arousalValue=15 ),
+        eArousal.sacrifice       : ArousalPrm(dispName="犠牲", arousalValue=16 ),
+        eArousal.order           : ArousalPrm(dispName="命令", arousalValue=15 ),
+        eArousal.forcedObles     : ArousalPrm(dispName="忘却", arousalValue=17 ),
+        eArousal.exploration     : ArousalPrm(dispName="探求", arousalValue=14 ),
+        eArousal.compensastion   : ArousalPrm(dispName="償い", arousalValue=18 ),
+        eArousal.birth           : ArousalPrm(dispName="生誕", arousalValue=17 ),
+    }
+
+    @classmethod
+    def getPrm( cls, id : eArousal ) :
+        return cls.prm[id]
+    @classmethod
+    def getDispName( cls, id : eArousal ) :
+        return cls.prm[id].dispName
+    @classmethod
+    def getArousalValue( cls, id : eArousal ) :
+        return cls.prm[id].arousalVal
+
+# ################################################################################################
+# 衝動
+# ################################################################################################
+@unique
+class eImpulse(IntEnum):
+    release      = auto() # 解放
+    suckingBlood = auto() # 吸血
+    hunger       = auto() # 飢餓
+    slaughter    = auto() # 殺戮
+    destruction  = auto() # 破壊
+    abusive      = auto() # 加虐
+    disgust      = auto() # 嫌悪
+    struggle     = auto() # 闘争
+    delusion     = auto() # 妄想
+    selfHarm     = auto() # 自傷
+    fear         = auto() # 恐怖
+    hatraed      = auto() # 憎悪
+
+class ImpulsePrm :
+    """ 衝動パラメータ class """
+    def __init__(self, dispName : str, arousalValue : int ) :
+        # instance vars
+        self.dispName   = dispName
+        self.arousalVal = arousalValue
+    def __del__(self) :
+        pass
+
+class Arousal :
+    """ 衝動 class """
+    # IDとパラメータを辞書型で管理する
+    prm = {
+        eImpulse.release      : ImpulsePrm(dispName="解放", arousalValue=18 ),
+        eImpulse.suckingBlood : ImpulsePrm(dispName="吸血", arousalValue=17 ),
+        eImpulse.hunger       : ImpulsePrm(dispName="飢餓", arousalValue=14 ),
+        eImpulse.slaughter    : ImpulsePrm(dispName="殺戮", arousalValue=18 ),
+        eImpulse.destruction  : ImpulsePrm(dispName="破壊", arousalValue=16 ),
+        eImpulse.abusive      : ImpulsePrm(dispName="加虐", arousalValue=15 ),
+        eImpulse.disgust      : ImpulsePrm(dispName="嫌悪", arousalValue=15 ),
+        eImpulse.struggle     : ImpulsePrm(dispName="闘争", arousalValue=16 ),
+        eImpulse.delusion     : ImpulsePrm(dispName="妄想", arousalValue=14 ),
+        eImpulse.selfHarm     : ImpulsePrm(dispName="自傷", arousalValue=16 ),
+        eImpulse.fear         : ImpulsePrm(dispName="恐怖", arousalValue=17 ),
+        eImpulse.hatraed      : ImpulsePrm(dispName="憎悪", arousalValue=18 ),
+    }
+
+    @classmethod
+    def getPrm( cls, id : eArousal ) :
+        return cls.prm[id]
+    @classmethod
+    def getDispName( cls, id : eArousal ) :
+        return cls.prm[id].dispName
+    @classmethod
+    def getArousalValue( cls, id : eArousal ) :
+        return cls.prm[id].arousalVal
+
+# ################################################################################################
+# 感情
+# ################################################################################################
+class feeling:
+    positiveList = [
+        "傾倒"      ,
+        "好奇心"    ,
+        "憧憬"      ,
+        "尊敬"      ,
+        "連帯感"    ,
+        "慈愛"      ,
+        "感服"      ,
+        "純愛"      ,
+        "友情"      ,
+        "慕情"      ,
+        "同情"      ,
+        "意志"      ,
+        "庇護"      ,
+        "幸福感"    ,
+        "信頼"      ,
+        "執着"      ,
+        "親近感"    ,
+        "誠意"      ,
+        "好意"      ,
+        "有為"      ,
+        "尽力"      ,
+        "懐旧"      ,
+    ]
+    negativeList = [
+        "侮蔑"      ,
+        "食傷"      ,
+        "脅威"      ,
+        "嫉妬"      ,
+        "悔悟"      ,
+        "恐怖"      ,
+        "不安"      ,
+        "劣等感"    ,
+        "疎外感"    ,
+        "恥辱"      ,
+        "憐憫"      ,
+        "偏愛"      ,
+        "憎悪"      ,
+        "隔意"      ,
+        "嫌悪"      ,
+        "猜疑心"    ,
+        "厭気"      ,
+        "不信感"    ,
+        "不快感"    ,
+        "憤懣"      ,
+        "敵愾心"    ,
+        "無関心"    ,
+    ]
+
+# ################################################################################################
+# ブリード
+# ################################################################################################
+@unique
+class eBleed(IntEnum):
+    pureBleed  = auto() # ピュアブリード
+    crossBleed = auto() # クロスブリード
+    triBleed   = auto() # トライブリード
+
+class BleedPrm :
+    """ ブリードパラメータ class """
+    def __init__(self, dispName : str ) :
+        # instance vars
+        self.dispName   = dispName
+    def __del__(self) :
+        pass
+
+class Bleed :
+    """ ブリード class """
+    # IDとパラメータを辞書型で管理する
+    prm = {
+        eBleed.pureBleed  : BleedPrm(dispName="ピュアブリード"),
+        eBleed.crossBleed : BleedPrm(dispName="クロスブリード"),
+        eBleed.triBleed   : BleedPrm(dispName="トライブリード"),
+    }
+
+    @classmethod
+    def getPrm( cls, id : eArousal ) :
+        return cls.prm[id]
+    @classmethod
+    def getDispName( cls, id : eArousal ) :
+        return cls.prm[id].dispName
+
+# ################################################################################################
+# シンドローム
+# ################################################################################################
+@unique
+class eSyndrome(IntEnum):
+    angelHalo  = auto() # エンジェルハィロゥ
+    balor      = auto() # バロール
+    blackDog   = auto() # ブラックドッグ
+    bramStoker = auto() # ブラム＝ストーカー
+    chimaera   = auto() # キュマイラ
+    exile      = auto() # エグザイル
+    hanuman    = auto() # ハヌマーン
+    morpheus   = auto() # モルフェウス
+    neumann    = auto() # ノイマン
+    orcus      = auto() # オルクス
+    saramandra = auto() # サラマンダー
+    solaris    = auto() # ソラリス
+
+class SyndromePrm :
+    """ シンドロームパラメータ class """
+    def __init__(self, dispName : str, bodyVal : int, senseVal : int, mentalVal : int, socialityVal : int ) :
+        # instance vars
+        self.dispName     = dispName
+        self.bodyVal      = bodyVal
+        self.senseVal     = senseVal
+        self.mentalVal    = mentalVal
+        self.socialityVal = socialityVal
+        
+    def __del__(self) :
+        pass
+
+class Syndrome :
+    """ シンドローム class """
+    # IDとパラメータを辞書型で管理する
+    prm = {
+        eSyndrome.angelHalo  : SyndromePrm( dispName="エンジェルハィロゥ" , bodyVal = 0, senseVal = 3, mentalVal = 1, socialityVal = 0 ),
+        eSyndrome.balor      : SyndromePrm( dispName="バロール"           , bodyVal = 0, senseVal = 1, mentalVal = 3, socialityVal = 1 ),
+        eSyndrome.blackDog   : SyndromePrm( dispName="ブラックドッグ"     , bodyVal = 2, senseVal = 1, mentalVal = 1, socialityVal = 0 ),
+        eSyndrome.bramStoker : SyndromePrm( dispName="ブラム＝ストーカー" , bodyVal = 1, senseVal = 2, mentalVal = 1, socialityVal = 0 ),
+        eSyndrome.chimaera   : SyndromePrm( dispName="キュマイラ"         , bodyVal = 3, senseVal = 0, mentalVal = 0, socialityVal = 1 ),
+        eSyndrome.exile      : SyndromePrm( dispName="エグザイル"         , bodyVal = 2, senseVal = 1, mentalVal = 0, socialityVal = 1 ),
+        eSyndrome.hanuman    : SyndromePrm( dispName="ハヌマーン"         , bodyVal = 1, senseVal = 1, mentalVal = 1, socialityVal = 1 ),
+        eSyndrome.morpheus   : SyndromePrm( dispName="モルフェウス"       , bodyVal = 1, senseVal = 2, mentalVal = 0, socialityVal = 1 ),
+        eSyndrome.neumann    : SyndromePrm( dispName="ノイマン"           , bodyVal = 0, senseVal = 0, mentalVal = 3, socialityVal = 1 ),
+        eSyndrome.orcus      : SyndromePrm( dispName="オルクス"           , bodyVal = 0, senseVal = 1, mentalVal = 1, socialityVal = 2 ),
+        eSyndrome.saramandra : SyndromePrm( dispName="サラマンダー"       , bodyVal = 2, senseVal = 0, mentalVal = 1, socialityVal = 1 ),
+        eSyndrome.solaris    : SyndromePrm( dispName="ソラリス"           , bodyVal = 0, senseVal = 0, mentalVal = 1, socialityVal = 1 ),
+    }
+
+    @classmethod
+    def getPrm( cls, id : eArousal ) :
+        return cls.prm[id]
+    @classmethod
+    def getDispName( cls, id : eArousal ) :
+        return cls.prm[id].dispName
+

@@ -24,6 +24,7 @@ class DX3Character(object):
         pass
     
     def bind(self, id : ePrmId, callback : Callable[ [], None ]) -> None :
+        """ パラメータが変更されたとき、bindに登録したコールバックが呼び出される """
         self.__observers[id].bind(callback)
         
     # Character Name
@@ -54,7 +55,7 @@ class Personality(object):
     """ Personal data class """
     def __init__(self) :
         # instance vars
-        self.name            = ""
+        self.name : str      = ""
         self.codeName        = ""
         self.works : eWorks  = 0
         self.cover           = ""
