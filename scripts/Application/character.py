@@ -164,3 +164,14 @@ class ComboData(object):
     def __del__(self) :
         pass
 
+class Buff(object):
+    """ バフに関するクラス """
+    def __init__(self) :
+        # instance vars
+        self.diceIncrease = 0 # ダイス増加（侵食値）
+        self.diceNum      = 0 # ダイス補正
+        self.critical     = 0 # C値補正
+        self.accuracy     = 0 # 命中（達成値）補正
+        self.attack       = 0 # 攻撃力補正
+    def __del__(self) :
+        pass

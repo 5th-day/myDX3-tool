@@ -800,3 +800,56 @@ class Syndrome :
     def getDispName( cls, id : eArousal ) :
         return cls.prm[id].dispName
 
+# ################################################################################################
+# エフェクト
+# ################################################################################################
+class EffectPrm:
+    """ エフェクトパラメータ class """
+    def __init__(self,
+            dispName,
+            syndrome,
+            maxLevel,
+            timing,
+            skill,
+            difficulty,
+            target,
+            range,
+            erodedVal,
+            limit,
+            diceNumChange = False,
+            remarks : str = "",
+            refPage = None,
+            # その他適宜必要なフラグなどを後で追加する ↓例
+            isForceSameSyndrome : bool = False,
+            isForceTarget       : bool = False,
+            isForceRange        : bool = False,
+        ):
+        self.dispName   = dispName
+        self.syndrome   = syndrome
+        self.maxLevel   = maxLevel
+        self.timing     = timing
+        self.difficulty = difficulty
+        self.skill      = skill
+        self.target     = target
+        self.range      = range
+        self.erodedVal  = erodedVal
+        self.limit      = limit
+        self.remarks    = remarks
+        self.refPage    = refPage
+
+class Effect:
+    """ エフェクト class """
+    def __init__(self):
+        pass
+        
+# ################################################################################################
+# コンボ
+# ################################################################################################
+class ComboPrm:
+    """ コンボパラメータ class """
+    def __init__(self):
+        self.effects = []
+        
+    def setEffects( self, effects : list[Effect] ) -> None :
+        for effect in effects:
+            self.effects.append( effect )
