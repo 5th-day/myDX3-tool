@@ -68,7 +68,7 @@ class PageLayout(ft.UserControl):
         self.playerInfoUi  = PlayerInfoUi()
         self.lifepathUi    = LifepathUi()
         self.appearanceUi  = AppearanceUi()
-        self.basicPointsUi = BasicPointsUi()
+        self.basicPointsUi = SubAbilityUi()
         self.abilityUi     = AbilityUi()
         self.bleedUi       = BleedUi()
         self.syndromeUi    = SyndromeUi()
@@ -567,7 +567,7 @@ class AppearanceUi(ft.UserControl):
         self.img.update()
         
 # ###############################################################################################
-class BasicPointsUi(ft.UserControl):
+class SubAbilityUi(ft.UserControl):
     """ 副能力値 HP最大値など """
     def __init__(self):
         super().__init__()
@@ -605,7 +605,7 @@ class BasicPointsUi(ft.UserControl):
         )
     
     def __initMaxHpUi(self):
-        self.maxHpUi = BasicPointsItem("外見","肉体","精神" )
+        self.maxHpUi = BasicPointsItem("HP最大値","肉体","精神" )
 
     def __initRegularStockUi(self):
         self.regularStockUi = BasicPointsItem("常備化P","社会","調達" )
