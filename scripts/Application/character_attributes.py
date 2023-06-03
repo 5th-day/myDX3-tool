@@ -20,7 +20,7 @@ class ePrmId(IntEnum):
     bloodType             = auto()
     memo                  = auto()
     playerName            = auto()
-    playerExp             = auto()
+    resumeExp             = auto()
     birthPlace            = auto()
     experience            = auto()
     encount               = auto()
@@ -43,7 +43,7 @@ class ePrmId(IntEnum):
     mentalSkillPoint      = auto()
     socialitySkillPoint   = auto()
     bleed                 = auto()
-    syndrome1             = auto()
+    syndrome              = auto()
     syndrome2             = auto()
     optionalSyndrome      = auto()
     effect                = auto()
@@ -188,13 +188,13 @@ class Works :
     }
 
     @classmethod
-    def getPrm( cls, id : eWorks ) :
+    def getPrm( cls, id : eWorks ) -> WorksPrm:
         return cls.prm[id]
     @classmethod
-    def getDispName( cls, id : eWorks ) :
+    def getDispName( cls, id : eWorks ) -> str:
         return cls.prm[id].dispName
     @classmethod
-    def getFactor( cls, id : eWorks ) :
+    def getFactor( cls, id : eWorks ) -> str:
         return cls.prm[id].factor
     @classmethod
     def getSkills( cls, id : eWorks ) :
@@ -375,7 +375,7 @@ class ExperiencePrm :
         pass
     
 
-class StudendExperience :
+class StudentExperience :
     """ 経験 class """
     # IDとパラメータを辞書型で管理する
     prm = {
@@ -532,20 +532,24 @@ class Encount:
         "主人"      : "霧谷雄吾"                        ,
         "借り"      : "ヨハン・C・コードウェル"         ,
         "いいひと"  : "谷修成"                          ,
-        "家族"     : "神城早月"                         ,
-        "友人"     : "敷島あやめ"                       ,
-        "同志"     : "テレーズ・ブルム"                 ,
-        "ビジネス" : "神城早月"                         ,
-        "同行者"   : "玉野椿"                           ,
-        "忘却"     : "アルフレッド・J・コードウェル"    ,
-        "慕情"     : "姫宮由里香"                       ,
-        "貸し"     : "猫川美亜"                         ,
-        "幼子"     : "テレーズ・ブルム"                 ,
-        "腐れ縁"   : "春日恭二"                         ,
-        "秘密"     : "ローザ・バスカヴィル"             ,
-        "好敵手"   : "黒崎剛道"                         ,
-        "殺意"     : "伊庭宗一"                         ,
+        "家族"      : "神城早月"                        ,
+        "友人"      : "敷島あやめ"                      ,
+        "同志"      : "テレーズ・ブルム"                ,
+        "ビジネス"  : "神城早月"                        ,
+        "同行者"    : "玉野椿"                          ,
+        "忘却"      : "アルフレッド・J・コードウェル"   ,
+        "慕情"      : "姫宮由里香"                      ,
+        "貸し"      : "猫川美亜"                        ,
+        "幼子"      : "テレーズ・ブルム"                ,
+        "腐れ縁"    : "春日恭二"                        ,
+        "秘密"      : "ローザ・バスカヴィル"            ,
+        "好敵手"    : "黒崎剛道"                        ,
+        "殺意"      : "伊庭宗一"                        ,
     }
+    
+    @classmethod
+    def getPerson(cls, relation: str):
+        return cls.dict[str]
 
 # ################################################################################################
 # 覚醒
@@ -567,10 +571,10 @@ class eArousal(IntEnum):
 
 class ArousalPrm :
     """ 覚醒パラメータ class """
-    def __init__(self, dispName : str, arousalValue : int ) :
+    def __init__(self, dispName : str, erodedValue : int ) :
         # instance vars
         self.dispName  = dispName
-        self.arousalVal = arousalValue
+        self.erodedVal = erodedValue
     def __del__(self) :
         pass
     
@@ -579,18 +583,18 @@ class Arousal :
     """ 覚醒 class """
     # IDとパラメータを辞書型で管理する
     prm = {
-        eArousal.death           : ArousalPrm(dispName="死"  , arousalValue=18 ),
-        eArousal.anger           : ArousalPrm(dispName="憤怒", arousalValue=17 ),
-        eArousal.prime           : ArousalPrm(dispName="素体", arousalValue=16 ),
-        eArousal.infection       : ArousalPrm(dispName="感染", arousalValue=14 ),
-        eArousal.craving         : ArousalPrm(dispName="渇望", arousalValue=17 ),
-        eArousal.ignorance       : ArousalPrm(dispName="無知", arousalValue=15 ),
-        eArousal.sacrifice       : ArousalPrm(dispName="犠牲", arousalValue=16 ),
-        eArousal.order           : ArousalPrm(dispName="命令", arousalValue=15 ),
-        eArousal.forcedObles     : ArousalPrm(dispName="忘却", arousalValue=17 ),
-        eArousal.exploration     : ArousalPrm(dispName="探求", arousalValue=14 ),
-        eArousal.compensastion   : ArousalPrm(dispName="償い", arousalValue=18 ),
-        eArousal.birth           : ArousalPrm(dispName="生誕", arousalValue=17 ),
+        eArousal.death           : ArousalPrm(dispName="死"  , erodedValue=18 ),
+        eArousal.anger           : ArousalPrm(dispName="憤怒", erodedValue=17 ),
+        eArousal.prime           : ArousalPrm(dispName="素体", erodedValue=16 ),
+        eArousal.infection       : ArousalPrm(dispName="感染", erodedValue=14 ),
+        eArousal.craving         : ArousalPrm(dispName="渇望", erodedValue=17 ),
+        eArousal.ignorance       : ArousalPrm(dispName="無知", erodedValue=15 ),
+        eArousal.sacrifice       : ArousalPrm(dispName="犠牲", erodedValue=16 ),
+        eArousal.order           : ArousalPrm(dispName="命令", erodedValue=15 ),
+        eArousal.forcedObles     : ArousalPrm(dispName="忘却", erodedValue=17 ),
+        eArousal.exploration     : ArousalPrm(dispName="探求", erodedValue=14 ),
+        eArousal.compensastion   : ArousalPrm(dispName="償い", erodedValue=18 ),
+        eArousal.birth           : ArousalPrm(dispName="生誕", erodedValue=17 ),
     }
 
     @classmethod
@@ -600,8 +604,8 @@ class Arousal :
     def getDispName( cls, id : eArousal ) :
         return cls.prm[id].dispName
     @classmethod
-    def getArousalValue( cls, id : eArousal ) :
-        return cls.prm[id].arousalVal
+    def getErodedValue( cls, id : eArousal ) :
+        return cls.prm[id].erodedVal
 
 # ################################################################################################
 # 衝動
@@ -623,45 +627,45 @@ class eImpulse(IntEnum):
 
 class ImpulsePrm :
     """ 衝動パラメータ class """
-    def __init__(self, dispName : str, arousalValue : int ) :
+    def __init__(self, dispName : str, erodedValue : int ) :
         # instance vars
-        self.dispName   = dispName
-        self.arousalVal = arousalValue
+        self.dispName  = dispName
+        self.erodedVal = erodedValue
     def __del__(self) :
         pass
 
-class Arousal :
+class Impulse :
     """ 衝動 class """
     # IDとパラメータを辞書型で管理する
     prm = {
-        eImpulse.release      : ImpulsePrm(dispName="解放", arousalValue=18 ),
-        eImpulse.suckingBlood : ImpulsePrm(dispName="吸血", arousalValue=17 ),
-        eImpulse.hunger       : ImpulsePrm(dispName="飢餓", arousalValue=14 ),
-        eImpulse.slaughter    : ImpulsePrm(dispName="殺戮", arousalValue=18 ),
-        eImpulse.destruction  : ImpulsePrm(dispName="破壊", arousalValue=16 ),
-        eImpulse.abusive      : ImpulsePrm(dispName="加虐", arousalValue=15 ),
-        eImpulse.disgust      : ImpulsePrm(dispName="嫌悪", arousalValue=15 ),
-        eImpulse.struggle     : ImpulsePrm(dispName="闘争", arousalValue=16 ),
-        eImpulse.delusion     : ImpulsePrm(dispName="妄想", arousalValue=14 ),
-        eImpulse.selfHarm     : ImpulsePrm(dispName="自傷", arousalValue=16 ),
-        eImpulse.fear         : ImpulsePrm(dispName="恐怖", arousalValue=17 ),
-        eImpulse.hatraed      : ImpulsePrm(dispName="憎悪", arousalValue=18 ),
+        eImpulse.release      : ImpulsePrm(dispName="解放", erodedValue=18 ),
+        eImpulse.suckingBlood : ImpulsePrm(dispName="吸血", erodedValue=17 ),
+        eImpulse.hunger       : ImpulsePrm(dispName="飢餓", erodedValue=14 ),
+        eImpulse.slaughter    : ImpulsePrm(dispName="殺戮", erodedValue=18 ),
+        eImpulse.destruction  : ImpulsePrm(dispName="破壊", erodedValue=16 ),
+        eImpulse.abusive      : ImpulsePrm(dispName="加虐", erodedValue=15 ),
+        eImpulse.disgust      : ImpulsePrm(dispName="嫌悪", erodedValue=15 ),
+        eImpulse.struggle     : ImpulsePrm(dispName="闘争", erodedValue=16 ),
+        eImpulse.delusion     : ImpulsePrm(dispName="妄想", erodedValue=14 ),
+        eImpulse.selfHarm     : ImpulsePrm(dispName="自傷", erodedValue=16 ),
+        eImpulse.fear         : ImpulsePrm(dispName="恐怖", erodedValue=17 ),
+        eImpulse.hatraed      : ImpulsePrm(dispName="憎悪", erodedValue=18 ),
     }
 
     @classmethod
-    def getPrm( cls, id : eArousal ) :
+    def getPrm( cls, id : eImpulse ) :
         return cls.prm[id]
     @classmethod
-    def getDispName( cls, id : eArousal ) :
+    def getDispName( cls, id : eImpulse ) :
         return cls.prm[id].dispName
     @classmethod
-    def getArousalValue( cls, id : eArousal ) :
-        return cls.prm[id].arousalVal
+    def getErodedValue( cls, id : eImpulse ) :
+        return cls.prm[id].erodedVal
 
 # ################################################################################################
 # 感情
 # ################################################################################################
-class feeling:
+class Feeling:
     positiveList = [
         "傾倒"      ,
         "好奇心"    ,
@@ -813,29 +817,38 @@ class EffectPrm:
             skill,
             difficulty,
             target,
-            range,
+            reach,
             erodedVal,
             limit,
             diceNumChange = False,
             remarks : str = "",
-            refPage = None,
-            # その他適宜必要なフラグなどを後で追加する ↓例
-            isForceSameSyndrome : bool = False,
-            isForceTarget       : bool = False,
-            isForceRange        : bool = False,
+            ruleBookPage = "",
+            # その他適宜必要なフラグなどを後で追加する
+            isForceSameSyndrome  : bool = False,
+            isForceTarget        : bool = False,
+            isForceRange         : bool = False,
+            isAssignableSyndrome : bool = False,
         ):
-        self.dispName   = dispName
-        self.syndrome   = syndrome
-        self.maxLevel   = maxLevel
-        self.timing     = timing
-        self.difficulty = difficulty
-        self.skill      = skill
-        self.target     = target
-        self.range      = range
-        self.erodedVal  = erodedVal
-        self.limit      = limit
-        self.remarks    = remarks
-        self.refPage    = refPage
+        # vars
+        self.dispName     = dispName
+        self.syndrome     = syndrome
+        self.maxLevel     = maxLevel
+        self.timing       = timing
+        self.difficulty   = difficulty
+        self.skill        = skill
+        self.target       = target
+        self.reach        = reach
+        self.erodedVal    = erodedVal
+        self.limit        = limit
+        self.remarks      = remarks
+        self.ruleBookPage = ruleBookPage
+        
+        # flags
+        self.isForceSameSyndrome  = isForceSameSyndrome 
+        self.isForceTarget        = isForceTarget       
+        self.isForceRange         = isForceRange        
+        self.isAssignableSyndrome = isAssignableSyndrome
+
 
 class Effect:
     """ エフェクト class """
@@ -853,3 +866,18 @@ class ComboPrm:
     def setEffects( self, effects : list[Effect] ) -> None :
         for effect in effects:
             self.effects.append( effect )
+
+# ################################################################################################
+# バフ
+# ################################################################################################
+class Buff(object):
+    """ バフに関するクラス """
+    def __init__(self) :
+        # instance vars
+        self.diceIncrease = 0 # ダイス増加（侵食値）
+        self.diceNum      = 0 # ダイス補正
+        self.critical     = 0 # C値補正
+        self.accuracy     = 0 # 命中（達成値）補正
+        self.attack       = 0 # 攻撃力補正
+    def __del__(self) :
+        pass
