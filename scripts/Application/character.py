@@ -324,17 +324,61 @@ class DX3Character(object):
     def getBodyValue(self) -> int :
         return self.__prm.ability.body.val
 
+    def setBodyGrowthPoint(self, point : int ) :
+        # set prm
+        self.__prm.ability.body.growth = point
+        # notify prm change
+        self.__observers[ePrmId.bodyGrowthPoint].notify()
+        # update prm
+        self._updateAbilityValue()
+       
+    def getBodyGrowthPoint(self) -> int :
+        return self.__prm.ability.body.growth
+    
     # 感覚値
     def getSenseValue(self) -> int :
         return self.__prm.ability.sense.val
 
+    def setSenseGrowthPoint(self, point : int ) :
+        # set prm
+        self.__prm.ability.sense.growth = point
+        # notify prm change
+        self.__observers[ePrmId.senseGrowthPoint].notify()
+        # update prm
+        self._updateAbilityValue()
+       
+    def getSenseGrowthPoint(self) -> int :
+        return self.__prm.ability.sense.growth
+    
     # 精神値
     def getMentalValue(self) -> int :
         return self.__prm.ability.mental.val
 
+    def setMentalGrowthPoint(self, point : int ) :
+        # set prm
+        self.__prm.ability.mental.growth = point
+        # notify prm change
+        self.__observers[ePrmId.mentalGrowthPoint].notify()
+        # update prm
+        self._updateAbilityValue()
+       
+    def getMentalGrowthPoint(self) -> int :
+        return self.__prm.ability.mental.growth
+    
     # 社会値
     def getSocialityValue(self) -> int :
         return self.__prm.ability.sociality.val
+    
+    def setSocialityGrowthPoint(self, point : int ) :
+        # set prm
+        self.__prm.ability.sociality.growth = point
+        # notify prm change
+        self.__observers[ePrmId.socialityGrowthPoint].notify()
+        # update prm
+        self._updateAbilityValue()
+       
+    def getSocialityGrowthPoint(self) -> int :
+        return self.__prm.ability.sociality.growth
     
     # ################　副能力値　#########################
     # HP最大値
