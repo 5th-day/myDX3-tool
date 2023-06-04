@@ -314,8 +314,11 @@ class DX3Character(object):
         
         # update 副能力値（能力値が関わるもの）
         # HP最大値
+        self._updateMaxHp()
         # 常備化P
+        self._updateRegularStockPoint()
         # 行動値
+        self._updateMovePoint()
         
     # 肉体値
     def getBodyValue(self) -> int :
@@ -336,46 +339,78 @@ class DX3Character(object):
     # ################　副能力値　#########################
     # HP最大値
     def _updateMaxHp(self) -> None :
-        pass
+        # set prm
+        maxHp = self.getBodyValue() * 2 + self.getMentalValue() + 20
+        self.__prm.subAbility.maxHp = maxHp
+        
+        # notify prm change
+        self.__observers[ePrmId.maxHp].notify()
     
     def getMaxHp(self) -> int :
-        pass
-        return self.__prm.subAbility
+        return self.__prm.subAbility.maxHp
 
     # 常備化P
     def _updateRegularStockPoint(self) -> None :
-        pass
+        # set prm
+        # Todo：調達Pを加算
+        regulaStock = (self.getSocialityValue() + 0) * 2
+        
+        # notify prm change
+        self.__observers[ePrmId.regularStock].notify()
+        
+        # 財産Pを更新
+        self._updateWalletPoint()
     
     def getRegularStockPoint(self) -> int :
-        pass
+        return self.__prm.subAbility.regularStockPoint
 
     # 行動値
     def _updateMovePoint(self) -> None :
-        pass
+        # set prm
+        movePoint = self.getSenseValue() * 2 + self.getMentalValue()
+        self.__prm.subAbility.movePoint = movePoint
+        # notify prm change
+        self.__observers[ePrmId.movePoint].notify()
+        
+        # 戦闘移動を更新
+        self._updateBattleMove()
     
     def getMovePoint(self) -> int :
-        pass
+        return self.__prm.subAbility.movePoint
 
     # 財産P
     def _updateWalletPoint(self) -> None :
-        pass
+        # set prm
+        # Todo : 使用Pを減算
+        self.__prm.subAbility.walletPoint = self.getRegularStockPoint() - 0
+        # notify prm change
+        self.__observers[ePrmId.walletPoint].notify()
     
     def getWalletPoint(self) -> int :
-        pass
+        return self.__prm.subAbility.walletPoint
 
     # 戦闘移動
     def _updateBattleMove(self) -> None :
-        pass
+        # set prm
+        self.__prm.subAbility.battleMove = self.getMovePoint() + 5
+        # notify prm change
+        self.__observers[ePrmId.battleMove].notify()
+        
+        # 全力移動を更新
+        self._updateFullPowerMove()
     
     def getBattleMove(self) -> int :
-        pass
+        return self.__prm.subAbility.battleMove
 
     # 全力移動
     def _updateFullPowerMove(self) -> None :
-        pass
+        # set prm
+        self.__prm.subAbility.fullPowerMove = self.getMovePoint() * 2
+        # notify prm change
+        self.__observers[ePrmId.fullPowerMove].notify()
     
     def getFullPowerMove(self) -> int :
-        pass
+        return self.__prm.subAbility.fullPowerMove
 
     # ################　ブリード、シンドローム　#########################
     # ブリード
@@ -502,7 +537,7 @@ class DX3CharacterData(object):
         self.personality = Personality()
         self.lifepath    = LifePath()
         self.ability     = Ability()
-        self.subAbility  = None
+        self.subAbility  = SubAbility()
         self.loisList    = []
         
         self.bleed : eBleed         = None
@@ -624,6 +659,15 @@ class AbilitySocialityPrm(AbilityPrm):
         self.skillList.append( SkillPrm("交渉"))
         self.skillList.append( SkillPrm("調達"))
         self.skillList.append( SkillPrm("情報"))
+
+class SubAbility(object):
+    def __init__(self) -> None:
+        self.maxHp = 0 
+        self.regularStockPoint = 0
+        self.movePoint         = 0
+        self.walletPoint       = 0
+        self.battleMove        = 0
+        self.fullPowerMove     = 0
 
 class SkillPrm(object):
     """ スキルに関するクラス """
