@@ -54,7 +54,7 @@ class DX3Character(object):
         return self.__prm.personality.codeName
 
     # Works
-    def setCWorkws(self, works: eWorks) -> None:
+    def setWorkws(self, works: eWorks) -> None:
         # set prm
         self.__prm.personality.works = works
         # notify prm change
@@ -172,6 +172,7 @@ class DX3Character(object):
         self.__observers[ePrmId.appearance].notify()
     
     def getAppearance(self) -> str:
+        """ Return base64 image data """
         return self.__prm.personality.appearance
     
     # 使用経験点
@@ -304,10 +305,10 @@ class DX3Character(object):
         sociality   += self.__prm.ability.sociality.growth
         
         # 反映
-        self.__prm.ability.body         = body
-        self.__prm.ability.sense        = sense
-        self.__prm.ability.mental       = mental
-        self.__prm.ability.sociality    = sociality
+        self.__prm.ability.body.val         = body
+        self.__prm.ability.sense.val        = sense
+        self.__prm.ability.mental.val       = mental
+        self.__prm.ability.sociality.val    = sociality
         
         # notify prm change
         self.__observers[ePrmId.bodyPoint     ].notify()
@@ -587,10 +588,10 @@ class DX3CharacterData(object):
         self.subAbility  = SubAbility()
         self.loisList    = []
         
-        self.bleed : eBleed         = None
-        self.syndrome1 : eSyndrome  = None
-        self.syndrome2 : eSyndrome  = None
-        self.optionalSyndrome : eSyndrome = None
+        self.bleed : eBleed         = eBleed.pureBleed
+        self.syndrome1 : eSyndrome  = eSyndrome.empty
+        self.syndrome2 : eSyndrome  = eSyndrome.empty
+        self.optionalSyndrome : eSyndrome = eSyndrome.empty
         
         self.effectList : list[EffectPrm] = []   
         self.comboList  : list[ComboPrm]  = []

@@ -757,6 +757,7 @@ class Bleed :
 # ################################################################################################
 @unique
 class eSyndrome(IntEnum):
+    empty      = auto() # 空白
     angelHalo  = auto() # エンジェルハィロゥ
     balor      = auto() # バロール
     blackDog   = auto() # ブラックドッグ
@@ -787,6 +788,7 @@ class Syndrome :
     """ シンドローム class """
     # IDとパラメータを辞書型で管理する
     prm = {
+        eSyndrome.empty      : SyndromePrm( dispName=""                   , bodyVal = 0, senseVal = 0, mentalVal = 0, socialityVal = 0 ),
         eSyndrome.angelHalo  : SyndromePrm( dispName="エンジェルハィロゥ" , bodyVal = 0, senseVal = 3, mentalVal = 1, socialityVal = 0 ),
         eSyndrome.balor      : SyndromePrm( dispName="バロール"           , bodyVal = 0, senseVal = 1, mentalVal = 3, socialityVal = 1 ),
         eSyndrome.blackDog   : SyndromePrm( dispName="ブラックドッグ"     , bodyVal = 2, senseVal = 1, mentalVal = 1, socialityVal = 0 ),
@@ -802,10 +804,10 @@ class Syndrome :
     }
 
     @classmethod
-    def getPrm( cls, id : eArousal ) :
+    def getPrm( cls, id : eSyndrome ) :
         return cls.prm[id]
     @classmethod
-    def getDispName( cls, id : eArousal ) :
+    def getDispName( cls, id : eSyndrome ) :
         return cls.prm[id].dispName
 
 # ################################################################################################

@@ -160,7 +160,7 @@ class PersonalityUi (ft.UserControl):
             self.charaNameField,
             self.codeNameField,
             self.worksSelBox,
-            self.coverSelBox,
+            self.coverField,
             self.ageField,
             self.genderField,
             self.zodiacSignField,
@@ -192,7 +192,7 @@ class PersonalityUi (ft.UserControl):
                 ft.Row( [ self.charaNameStr  , self.charaNameField  ], alignment=ft.MainAxisAlignment.CENTER ),
                 ft.Row( [ self.codeNameStr   , self.codeNameField   ], alignment=ft.MainAxisAlignment.CENTER ),
                 ft.Row( [ self.worksStr      , self.worksSelBox     ], alignment=ft.MainAxisAlignment.CENTER ),
-                ft.Row( [ self.coverStr      , self.coverSelBox     ], alignment=ft.MainAxisAlignment.CENTER ),
+                ft.Row( [ self.coverStr      , self.coverField      ], alignment=ft.MainAxisAlignment.CENTER ),
                 ft.Row( [ self.ageStr        , self.ageField        , self.genderStr    ,self.genderField     , self.zodiacSignStr,self.zodiacSignField ], alignment=ft.MainAxisAlignment.CENTER ),
                 ft.Row( [ self.bodyHeightStr , self.bodyHeightField , self.bodyWeightStr,self.bodyWeightField, self.bloodTypeStr  ,self.bloodTypeField  ], alignment=ft.MainAxisAlignment.CENTER ),
                 ft.Row( [ self.memoStr       , self.memoField       ], alignment=ft.MainAxisAlignment.CENTER ),
@@ -218,7 +218,10 @@ class PersonalityUi (ft.UserControl):
         self.codeNameField = ft.TextField()
         self.codeNameField.width = self.fieldWidth
         
+        # observerに登録
+        App.character.bind( id = ePrmId.codeName, callback=self.updateCodeName )
         # callback
+        self.charaNameField.on_blur = lambda e : App.character.setCodeName(e.control.value)
         
     def __initWorks(self):
         # ワークス選択リスト
@@ -228,35 +231,37 @@ class PersonalityUi (ft.UserControl):
         self.worksSelBox.width = self.fieldWidth
 
         # list itemの登録
-        self.worksSelBox.options.append( ft.dropdown.Option( " " ) )
+        # self.worksSelBox.options.append( ft.dropdown.Option( " " ) )
         for id in eWorks :
             self.worksSelBox.options.append( ft.dropdown.Option( key=id, text=Works.getDispName(id) ) )
         
+        # observerに登録
+        App.character.bind( id = ePrmId.works, callback=self.updateCharaName )
         # callback
+        self.worksSelBox.on_change = lambda e : App.character.setWorkws( int(e.control.value) )
         
     def __initCover(self):
         # カヴァー
         self.coverStr = ft.Text( value="カヴァー", width=self.itemNameWidth )
-        self.coverSelBox = ft.Dropdown()
+        self.coverField = ft.TextField()
         
-        self.coverSelBox.witdh = self.fieldWidth
+        self.coverField.witdh = self.fieldWidth
         
-        # list itemの登録
-        self.coverSelBox.options.append( ft.dropdown.Option( " " ) )
-        for id in eWorks :
-            self.coverSelBox.options.append( ft.dropdown.Option( key=id, text=Works.getDispName(id) ) )
-        self.coverSelBox.options.append( ft.dropdown.Option( "その他" ) )
-        
+        # observerに登録
+        App.character.bind( id = ePrmId.cover, callback=self.updateCover )
         # callback
-        self.coverSelBox.on_change = self.coverOnChange
+        self.coverField.on_blur = lambda e : App.character.setCover(e.control.value)
         
     def __initAge(self) :
         # 年齢
         self.ageStr = ft.Text( value="年齢", width=self.itemNameWidthSmall )
-        self.ageField = ft.TextField(keyboard_type=ft.KeyboardType.NUMBER)
+        self.ageField = ft.TextField( keyboard_type=ft.KeyboardType.NUMBER, suffix_text="歳" )
         self.ageField.width = self.itemNameWidthSmall
         
+        # observerに登録
+        App.character.bind( id = ePrmId.cover, callback=self.updateAge )
         # callback
+        self.ageField.on_blur = lambda e : App.character.setAge( int(e.control.value) )
         
     def __initGender(self) :
         # 性別
@@ -264,7 +269,10 @@ class PersonalityUi (ft.UserControl):
         self.genderField = ft.TextField()
         self.genderField.width = self.itemNameWidthSmall
         
+        # observerに登録
+        App.character.bind( id = ePrmId.gender, callback=self.updateGender )
         # callback
+        self.ageField.on_blur = lambda e : App.character.setGender( e.control.value )
         
     def __initZodiacSign(self) :
         # 星座
@@ -272,7 +280,10 @@ class PersonalityUi (ft.UserControl):
         self.zodiacSignField = ft.TextField()
         self.zodiacSignField.width = self.itemNameWidthSmall
         
+        # observerに登録
+        App.character.bind( id = ePrmId.zodiacSign, callback=self.updateZodiacSign )
         # callback
+        self.ageField.on_blur = lambda e : App.character.setZodiacSign( e.control.value )
         
     def __initBodyHeight(self) :
         # 身長
@@ -280,8 +291,10 @@ class PersonalityUi (ft.UserControl):
         self.bodyHeightField = ft.TextField(keyboard_type=ft.KeyboardType.NUMBER, suffix_text="cm")
         self.bodyHeightField.width = self.itemNameWidthSmall
         
+        # observerに登録
+        App.character.bind( id = ePrmId.bodyHeight, callback=self.updateBodyHeight )
         # callback
-        self.bodyHeightField.on_blur = self.heightOnEdit
+        self.bodyHeightField.on_blur = lambda e : App.character.setBodyHeight( int( e.control.value ) )
         
     def __initBodyWeight(self) :
         # 体重
@@ -289,7 +302,10 @@ class PersonalityUi (ft.UserControl):
         self.bodyWeightField = ft.TextField(keyboard_type=ft.KeyboardType.NUMBER, suffix_text="kg")
         self.bodyWeightField.width = self.itemNameWidthSmall
         
+        # observerに登録
+        App.character.bind( id = ePrmId.bodyWeight, callback=self.updateBodyWeight )
         # callback
+        self.bodyWeightField.on_blur = lambda e : App.character.setBodyWeight( int( e.control.value ) )
         
     def __initBloodType(self) :
         # 血液型
@@ -297,7 +313,10 @@ class PersonalityUi (ft.UserControl):
         self.bloodTypeField = ft.TextField()
         self.bloodTypeField.width = self.itemNameWidthSmall
         
+        # observerに登録
+        App.character.bind( id = ePrmId.bloodType, callback=self.updateBloodType )
         # callback
+        self.bloodTypeField.on_blur = lambda e : App.character.setBloodType( e.control.value )
         
     def __initMemo(self):
          # メモ
@@ -310,26 +329,54 @@ class PersonalityUi (ft.UserControl):
         self.memoField.min_lines = 3
         self.memoField.max_lines = 3
 
+        # observerに登録
+        App.character.bind( id = ePrmId.memo, callback=self.updateMemoField )
         # callback
-        self.memoField.on_blur   = self.memoFieldOnEdited
-        # self.memoField.on_submit = self.memoFieldEdited
+        self.memoField.on_blur = lambda e : App.character.setMemo( e.control.value )
         
     def updateCharaName(self):
         self.charaNameField.value = App.character.getCharacterName()
         self.charaNameField.update()
     
-    def coverOnChange(self, e):
-        if ( self.coverSelBox.value == "その他" ):
-            pass
-        else:
-            pass
-        App.page.update()
+    def updateCodeName(self):
+        self.codeNameField.value = App.character.getCodeName()
+        self.codeNameField.update()
     
-    def heightOnEdit(self, e):
-        pass
+    def updateWorks(self):
+        self.worksSelBox.value = App.character.getWorks()
+        self.worksSelBox.update()
     
-    def memoFieldOnEdited(self, e):
-        pass
+    def updateCover(self):
+        self.coverField.value = App.character.getCover()
+        self.coverField.update()
+    
+    def updateAge(self):
+        self.ageField.value = App.character.getAge()
+        self.ageField.update()
+    
+    def updateGender(self):
+        self.genderField.value = App.character.getGender()
+        self.genderField.update()
+        
+    def updateZodiacSign(self):
+        self.zodiacSignField.value = App.character.getZodiacSign()
+        self.zodiacSignField.update()
+        
+    def updateBodyHeight(self):
+        self.bodyHeightField.value = App.character.getBodyHeight()
+        self.bodyHeightField.update()
+        
+    def updateBodyWeight(self):
+        self.bodyWeightField.value = App.character.getBodyWeight()
+        self.bodyWeightField.update()
+    
+    def updateBloodType(self):
+        self.bloodTypeField.value = App.character.getBloodType()
+        self.bloodTypeField.update()
+    
+    def updateMemoField(self):
+        self.memoField.value = App.character.getMemo()
+        self.memoField.update()
 
 # ##############################################################################################3#
 class PlayerInfoUi(ft.UserControl):
@@ -362,8 +409,14 @@ class PlayerInfoUi(ft.UserControl):
         self.plNameField = ft.TextField()
         self.plNameField.width = self.fieldWidth
         
+        # observerに登録
+        App.character.bind( id = ePrmId.playerName, callback=self.updatePlayerName )
         # callback
-        self.plNameField.on_blur = ""
+        self.plNameField.on_blur = lambda e : App.character.setPlayerName( e.control.value )
+        
+    def updatePlayerName(self):
+        self.plNameField.value = App.character.getPlayerName()
+        self.plNameField.update()
         
     def __initExp(self):
         # 使用経験点
@@ -373,12 +426,14 @@ class PlayerInfoUi(ft.UserControl):
 
         self.expField.width = self.fieldWidth - self.itemNameWidth
         
+        # observerに登録
+        App.character.bind( id = ePrmId.memo, callback=self.updateExp )
         # callback
-        self.expField.on_blur = self.expFiledOnEdited
+        self.expField.on_blur = lambda e : App.character.setResumeExp( int(e.control.value) )
         
-
-    def expFiledOnEdited(self, e):
-        pass
+    def updateExp(self):
+        self.expField.value = App.character.getResumeExp()
+        self.expField.update()
         
 # ###############################################################################################
 class LifepathUi(ft.UserControl):
@@ -535,13 +590,22 @@ class AppearanceUi(ft.UserControl):
             self.img,
             bgcolor=ft.colors.AMBER_100,
         )
+        
+        # observerに登録
+        App.character.bind( id = ePrmId.appearance, callback=self.updateAppearance )
+        
+        # callback
         self.imgFrame.on_click = self.appearanceOnClicked
         
         # 画像ファイルPicker　Instance
         # openFilePicker()の度にインスタンスを生成すると都度appendすることになるのでここで生成しておく
         self.pickFileDialog = ft.FilePicker(on_result=self.filePickerOnResult)
         App.page.overlay.append( self.pickFileDialog )
-        
+
+    def updateAppearance(self) :
+        img = App.character.getAppearance()
+        self.setImage(data = img)
+    
     def appearanceOnClicked(self,e):
         self.openFilePicker()
     
@@ -552,14 +616,16 @@ class AppearanceUi(ft.UserControl):
         if e.files is None:
             print("canceled")
             return
-        self.setImage(e.files[0].path)
+        
+        # setAppearance を実行した結果Observerからの通知によって自動的に表示画像が更新されるのでここで画像更新する必要はない
+        # self.setImage(e.files[0].path)
+        App.character.setAppearance(e.files[0].path)
     
     def setImage(self, path: str = None, data = None):
         if path is not None:
             self.img.src = path
         elif data is not None:
-            # Image Object ->　ft.Image
-            pass
+            self.img.src_base64 = data
         else :
             return
         
