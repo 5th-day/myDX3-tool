@@ -1,7 +1,9 @@
 # coding: UTF-8
 
 from typing import Callable, Union, Literal
+
 from .state import State, Observer
+from .img_lib import ImgLib
 from .character_attributes import *
 
 class DX3Character(object):
@@ -92,7 +94,7 @@ class DX3Character(object):
         self.__observers[ePrmId.gender].notify()
         
     def getGender(self) -> str :
-        return self.__prm.personality.Gender
+        return self.__prm.personality.gender
 
     # 星座
     def setZodiacSign(self, zodiacSign: str) -> None:
@@ -155,21 +157,22 @@ class DX3Character(object):
         return self.__prm.personality.playerName
 
     # 外見
-    def setAppearance(self, path : str = "", base64 = 0 ) :
+    def setAppearance(self, path : str = "", base64 = "" ) :
         # set prm
         if ( path != "" ) :     # pathが与えられた場合
-            pass
-        elif ( base64 != 0 ) :  # 画像データが与えられた場合
+            base64 = ImgLib.getBase64fromPath(path)
+        elif ( base64 != "" ) :  # 画像データが与えられた場合
             pass
         else : 
             print("Error")
             return
-
+        
+        self.__prm.personality.appearance = base64
         # notify prm change
         self.__observers[ePrmId.appearance].notify()
     
-    def getAppearance(self) :
-        pass
+    def getAppearance(self) -> str:
+        return self.__prm.personality.appearance
     
     # 使用経験点
     def setResumeExp(self, exp: int) -> None:
@@ -605,7 +608,7 @@ class Personality(object):
         self.works : eWorks  = 0
         self.cover           = ""
         self.age             = 0
-        self.gender          = 0
+        self.gender          = ""
         self.zodiacSign      = "" # 星座
         self.height          = 0
         self.weight          = 0
