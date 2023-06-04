@@ -605,24 +605,24 @@ class SubAbilityUi(ft.UserControl):
         )
     
     def __initMaxHpUi(self):
-        self.maxHpUi = BasicPointsItem("HP最大値","肉体","精神" )
+        self.maxHpUi = SubAbilityItem("HP最大値","肉体","精神" )
 
     def __initRegularStockUi(self):
-        self.regularStockUi = BasicPointsItem("常備化P","社会","調達" )
+        self.regularStockUi = SubAbilityItem("常備化P","社会","調達" )
     
     def __initBattleMoveUi(self):
-        self.BattleMoveUi = BasicPointsItem("戦闘移動","行動値",None )
+        self.BattleMoveUi = SubAbilityItem("戦闘移動","行動値",None )
     
     def __initMovePointUi(self):
-        self.movePointUi = BasicPointsItem("行動値","感覚","精神" )
+        self.movePointUi = SubAbilityItem("行動値","感覚","精神" )
     
     def __initWalletPointUi(self):
-        self.walletPointUi = BasicPointsItem("財産P","常備化P","使用P" )
+        self.walletPointUi = SubAbilityItem("財産P","常備化P","使用P" )
     
     def __initFullPowerMoveUi(self):
-        self.fullPowerUi = BasicPointsItem("全力移動","戦闘移動",None )
+        self.fullPowerUi = SubAbilityItem("全力移動","戦闘移動",None )
     
-class BasicPointsItem(ft.UserControl):
+class SubAbilityItem(ft.UserControl):
     """ HP最大値など """
     def __init__(self, dispStr : str, prm1str : str, prm2str : str = None, ):
         super().__init__()
