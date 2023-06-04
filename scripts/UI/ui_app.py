@@ -1,9 +1,9 @@
 # coding: UTF-8
 
-# from PIL import Image
 import flet as ft
 
-from Application.character import *
+from Application.character_attributes import *
+from Application.character import DX3Character
 
 # ##############################################################################################3#
 class App:
