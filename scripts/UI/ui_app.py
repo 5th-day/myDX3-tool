@@ -449,6 +449,7 @@ class LifepathUi(ft.UserControl):
         # init
         self.__initLifePathStr()
         self.__initBirthPlace()
+        self.__initExperienceList()
         self.__initExperience()
         self.__initEncount()
         self.__initArousal()
@@ -458,20 +459,21 @@ class LifepathUi(ft.UserControl):
     def build(self):
         return ft.Container(
             content=ft.Column([
-                ft.Row( [self.lifepathStr]  ),
-                ft.Row( self.birthPlace.row ),
-                ft.Row( self.experience.row ),
-                ft.Row( self.encount.row    ),
-                ft.Row( self.arousal.row    ),
-                ft.Row( self.impulse.row    ),
-                ft.Row( self.erodedValRow   ),
+                ft.Row( [self.lifepathStr]      ),
+                ft.Row( self.birthPlace.row     ),
+                ft.Row( self.experienceList.row ),
+                ft.Row( self.experience.row     ),
+                ft.Row( self.encount.row        ),
+                ft.Row( self.arousal.row        ),
+                ft.Row( self.impulse.row        ),
+                ft.Row( self.erodedValRow       ),
             ],),
             width=self.containerWidth,
             bgcolor=ft.colors.YELLOW,
         )
     
     class LifePathItem:
-        def __init__(self, dispStr : str, itemList : list = [], callbackOnChange =  None):
+        def __init__(self, dispStr : str, dropdownItem : dict[int,str] = {}, callbackOnChange =  None):
             self.dispStr = ft.Text( value = dispStr)
             self.itemSelBox = ft.Dropdown()
 
@@ -480,8 +482,8 @@ class LifepathUi(ft.UserControl):
             self.row = [ self.dispStr, self.itemSelBox ]
 
             # list itemの登録
-            self.itemSelBox.options.append( ft.dropdown.Option( " " ) )
-            self.setItemList( itemList )
+            # self.itemSelBox.options.append( ft.dropdown.Option( " " ) )
+            self.setItemList( dropdownItem )
             
             # callback
             self.itemSelBox.on_change = callbackOnChange
@@ -489,43 +491,122 @@ class LifepathUi(ft.UserControl):
         def __del__(self):
             pass
         
-        def setItemList( self, itemList : list ) :
-            for item in itemList :
-                self.itemSelBox.options.append( ft.dropdown.Option( item ) )
+        def setItemList( self, items : dict[int,str] ) :
+            """ Dropdownにアイテムを追加する関数
+                item : keyとvalueを持つ辞書型のリスト
+            """
+            for id, value in items.items() :
+                self.itemSelBox.options.append( ft.dropdown.Option( key=id, text=value ) )
                 
         def clearItemList( self ):
             self.itemSelBox.options.clear()
-            self.itemSelBox.options.append( ft.dropdown.Option( " ") )
+            
+        def setValue(self, value):
+            self.itemSelBox.value = value
+            
+        def getValue(self) -> str:
+            return self.itemSelBox.value
+        
+        def update(self) :
+            self.itemSelBox.update()
 
     def __initLifePathStr(self):
         # 出自
         self.lifepathStr = ft.Text("ライフパス")
-        # callback
         
     def __initBirthPlace(self):
+        dict = self.generateListForDropDown( eBirthPlace, BirthPlace )
         # 出自
-        self.birthPlace = self.LifePathItem("出自", callbackOnChange=self.birthPaceOnChanged)
-        # callback
+        self.birthPlace = self.LifePathItem("出自", dropdownItem=dict, callbackOnChange=self.birthPlaceOnChanged)
+        # observerに登録
+        App.character.bind( id = ePrmId.erodedVal, callback=self.updateBirthPlace )
+    
+    def updateBirthPlace(self):
+        self.birthPlace.setValue = App.character.getBirthPlace()
+        self.birthPlace.update()
         
+    def __initExperienceList(self):
+        dict = self.generateListForDropDown( eExperienceList, ExperienceList )
+        # 経験表
+        self.experienceList = self.LifePathItem("経験表", dropdownItem=dict, callbackOnChange=self.experienceListOnChange)
+    
     def __initExperience(self):
         # 経験
         self.experience = self.LifePathItem("経験", callbackOnChange=self.experienceOnChanged)
-        # callback
+        # observerに登録
+        App.character.bind( id = ePrmId.experience, callback=self.updateExperience )
+    
+    def updateExperienceItems(self, listType : eExperienceList ) :
+        """ 経験のドロップダウンボックスに表示するアイテムを変更する """
+        match listType :
+            case eExperienceList.student :
+                enum      = eStudentExperience
+                classType = StudentExperience
+            case eExperienceList.sociality :
+                enum      = eSocietyExperience
+                classType = SocietyExperience
+            case eExperienceList.underground :
+                enum      = eUndergroundExperience
+                classType = UndergroundExperience
+            case eExperienceList.ugn :
+                enum      = eUgnExperience
+                classType = UgnExperience
+            case _ :
+                print("Invalid 経験表")
+                return
+        # 辞書型でリストを取得
+        dict = self.generateListForDropDown( enum=enum, classType=classType )
+        
+        self.experience.clearItemList()
+        self.experience.setItemList( items=dict )
+        self.experience.update()
+        
+    def updateExperience(self):
+        # 経験表 Dropdownの更新
+        # self.experienceList.setValue( App.character.getExperienceList() )
+        self.experienceList.update()
+        # 経験 Dropdownの更新
+        self.updateExperienceItems( int(self.experienceList.getValue()) )
+        self.experience.setValue( App.character.getExperience() )
+        self.experience.update()
         
     def __initEncount(self):
         # 邂逅
-        self.encount = self.LifePathItem("邂逅", callbackOnChange=self.encountOnChanged)
-        # callback
+        # 邂逅はIntEnum型で管理していない（英訳の手間）
+        dict = {}
+        for relation in Encount.dict.keys() :
+            itemStr = relation + ": " + Encount.dict[relation]
+            dict[itemStr] = itemStr
+        
+        self.encount = self.LifePathItem("邂逅", dropdownItem=dict, callbackOnChange=self.encountOnChanged)
+        # observerに登録
+        App.character.bind( id = ePrmId.encount, callback=self.updateEncount )
+        
+    def updateEncount(self):
+        self.encount.setValue( App.character.getEncount() )
+        self.encount.update()
         
     def __initArousal(self):
+        dict = self.generateListForDropDown( eArousal, Arousal )
         # 覚醒
-        self.arousal = self.LifePathItem("覚醒", callbackOnChange=self.arousalOnChanged)
-        # callback
+        self.arousal = self.LifePathItem("覚醒", dropdownItem=dict, callbackOnChange=self.arousalOnChanged)
+        # observerに登録
+        App.character.bind( id = ePrmId.arousal, callback=self.updateArousal )
+        
+    def updateArousal(self):
+        self.arousal.setValue( App.character.getArousal() )
+        self.arousal.update()
         
     def __initImpulse(self):
+        dict = self.generateListForDropDown( eImpulse, Impulse )
         # 衝動
-        self.impulse = self.LifePathItem("衝動", callbackOnChange=self.impulseOnChanged)
-        # callback
+        self.impulse = self.LifePathItem("衝動", dropdownItem=dict, callbackOnChange=self.impulseOnChanged)
+        # observerに登録
+        App.character.bind( id = ePrmId.impulse, callback=self.updateImpulse )
+        
+    def updateImpulse(self):
+        self.impulse.setValue( App.character.getImpulse() )
+        self.impulse.update()
         
     def __initErodedVal(self):
         # 侵食率基礎値
@@ -535,20 +616,38 @@ class LifepathUi(ft.UserControl):
         
         self.erodedValRow = [ self.erodedValSpace, self.erodedValStr, self.erodedValField ]
         
-    def birthPaceOnChanged(self, e):
-        pass
+        # observerに登録
+        App.character.bind( id = ePrmId.erodedVal, callback=self.updateErodedVal )
+    
+    def updateErodedVal(self):
+        self.erodedValField.value = App.character.getErodedValue()
+        self.erodedValField.update()
+        
+    def birthPlaceOnChanged(self, e):
+        App.character.setBirthPlace( int(e.control.value) )
+        
+    def experienceListOnChange(self,e):
+        self.updateExperienceItems( int(e.control.value) )
         
     def experienceOnChanged(self, e):
-        pass
+        experienceList = self.experienceList.getValue()
+        App.character.setExperience( int(experienceList), int(e.control.value) )
         
     def encountOnChanged(self, e):
-        pass
+        App.character.setEncount( e.control.value )
         
     def arousalOnChanged(self, e):
-        pass
+        App.character.setArousal( int(e.control.value) )
         
     def impulseOnChanged(self, e):
-        pass
+        App.character.setImpulse( int(e.control.value) )
+    
+    def generateListForDropDown(self, enum : IntEnum, classType) -> dict[int, str] :
+        """ keyとvalueを持つ辞書型のリストを生成する """
+        dict = {}
+        for id in enum :
+            dict[id] = classType.getDispName(id)
+        return dict
         
 # ###############################################################################################
 class AppearanceUi(ft.UserControl):

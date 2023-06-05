@@ -1,6 +1,6 @@
 # coding: UTF-8
 
-from typing import Callable, Union, Literal
+from typing import Callable, Literal
 
 from .state import State, Observer
 from .img_lib import ImgLib
@@ -197,15 +197,15 @@ class DX3Character(object):
         return self.__prm.lifepath.birthPlace
 
     # 経験
-    # どの経験表か区別が必要
-    def setExperience(self, experience : Union[eStudentExperience, eSocietyExperience, eUgnExperience] ) -> None:
+    def setExperience(self, experienceList : eExperienceList, experience : eStudentExperience | eSocietyExperience | eUgnExperience ) -> None:
         # set prm
-        self.__prm.lifepath.experience = experience
+        self.__prm.lifepath.experienceList = experienceList
+        self.__prm.lifepath.experience     = experience
         # notify prm change
         self.__observers[ePrmId.experience].notify()
         
-    def getExperience(self) -> eBirthPlace :
-        return self.__prm.lifepath.experience
+    def getExperience(self) -> tuple[eExperienceList, eStudentExperience | eSocietyExperience | eUgnExperience] :
+        return self.__prm.lifepath.experienceList, self.__prm.lifepath.experience
 
     # 邂逅
     def setEncount(self, encount: str) -> None:
@@ -628,6 +628,7 @@ class LifePath(object):
     def __init__(self) :
         # instance vars
         self.birthPlace       = "" # 出自
+        self.experienceList   = "" # 経験表
         self.experience       = "" # 経験
         self.encount          = "" # 邂逅
         self.arousal          = "" # 覚醒

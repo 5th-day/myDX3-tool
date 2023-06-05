@@ -281,6 +281,37 @@ class BirthPlace :
 # 経験
 # ################################################################################################
 @unique
+class eExperienceList(IntEnum):
+    student     = auto() # 学生
+    sociality   = auto() # 社会人
+    underground = auto() # 裏社会
+    ugn         = auto() # UGN
+
+class ExperienceListPrm:
+    """ 経験表パラメータ """
+    def __init__(self, dispName : str) :
+        # instance vars
+        self.dispName  = dispName
+    def __del__(self) :
+        pass
+
+class ExperienceList:
+    """ 経験表クラス """
+    prm = {
+        eExperienceList.student     : BirthPlacePrm( dispName="学生"   ),
+        eExperienceList.sociality   : BirthPlacePrm( dispName="社会人" ),
+        eExperienceList.underground : BirthPlacePrm( dispName="裏社会" ),
+        eExperienceList.ugn         : BirthPlacePrm( dispName="UGN"    ),
+    }
+
+    @classmethod
+    def getPrm( cls, id : eExperienceList ) -> ExperienceListPrm:
+        return cls.prm[id]
+    @classmethod
+    def getDispName( cls, id : eExperienceList ) -> str:
+        return cls.prm[id].dispName
+
+@unique
 class eStudentExperience(IntEnum):
     mediocre                = auto() # 平凡
     eternalParting          = auto() # 永劫の別れ
@@ -303,6 +334,7 @@ class eStudentExperience(IntEnum):
     promise                 = auto() # 約束
     amnesia                 = auto() # 記憶喪失
 
+@unique
 class eSocietyExperience(IntEnum):
     mediocre                = auto() # 平凡
     eternalParting          = auto() # 永劫の別れ
@@ -325,6 +357,7 @@ class eSocietyExperience(IntEnum):
     forbiddenLove           = auto() # 禁断の愛
     amnesia                 = auto() # 記憶喪失
 
+@unique
 class eUndergroundExperience(IntEnum):
     idleless                = auto() # 無為
     eternalParting          = auto() # 永劫の別れ
@@ -347,6 +380,7 @@ class eUndergroundExperience(IntEnum):
     wolf                    = auto() # 一匹狼
     amnesia                 = auto() # 記憶喪失
 
+@unique
 class eUgnExperience(IntEnum):
     loyaltyToUGN            = auto() # UGNへの忠誠
     runawayOfPower          = auto() # 力の暴走
