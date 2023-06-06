@@ -771,21 +771,61 @@ class SubAbilityUi(ft.UserControl):
     
     def __initMaxHpUi(self):
         self.maxHpUi = SubAbilityItem("HP最大値","肉体","精神" )
-
+        # observerに登録
+        App.character.bind( id = ePrmId.maxHp, callback=self.updateMaxHp )
+        
+    def updateMaxHp(self):
+        self.maxHpUi.setPrm1 ( App.character.getBodyValue() )
+        self.maxHpUi.setPrm2 ( App.character.getBodyValue() )
+        self.maxHpUi.setTotal( App.character.getMaxHp() )
+    
     def __initRegularStockUi(self):
         self.regularStockUi = SubAbilityItem("常備化P","社会","調達" )
+        # observerに登録
+        App.character.bind( id = ePrmId.regularStock, callback=self.updateRegularStockPoint )
+        
+    def updateRegularStockPoint(self):
+        self.regularStockUi.setPrm1 ( App.character.getSocialityValue() )
+        # self.regularStockUi.setPrm2 ( 調達 )
+        self.regularStockUi.setTotal( App.character.getRegularStockPoint() )
     
     def __initBattleMoveUi(self):
         self.BattleMoveUi = SubAbilityItem("戦闘移動","行動値",None )
+        # observerに登録
+        App.character.bind( id = ePrmId.battleMove, callback=self.updateBattleMovePoint )
+        
+    def updateBattleMovePoint(self):
+        self.BattleMoveUi.setPrm1 ( App.character.getMovePoint() )
+        self.BattleMoveUi.setTotal( App.character.getBattleMove() )
     
     def __initMovePointUi(self):
         self.movePointUi = SubAbilityItem("行動値","感覚","精神" )
+        # observerに登録
+        App.character.bind( id = ePrmId.movePoint, callback=self.updateMovePoint )
+        
+    def updateMovePoint(self):
+        self.movePointUi.setPrm1 ( App.character.getSenseValue() )
+        self.movePointUi.setPrm2 ( App.character.getMentalValue() )
+        self.movePointUi.setTotal( App.character.getMovePoint() )
     
     def __initWalletPointUi(self):
         self.walletPointUi = SubAbilityItem("財産P","常備化P","使用P" )
+        # observerに登録
+        App.character.bind( id = ePrmId.walletPoint, callback=self.updateWalletPoint )
+        
+    def updateWalletPoint(self):
+        self.walletPointUi.setPrm1 ( App.character.getRegularStockPoint() )
+        # self.walletPointUi.setPrm2 ( 使用P )
+        self.walletPointUi.setTotal( App.character.getWalletPoint() )
     
     def __initFullPowerMoveUi(self):
         self.fullPowerUi = SubAbilityItem("全力移動","戦闘移動",None )
+        # observerに登録
+        App.character.bind( id = ePrmId.fullPowerMove, callback=self.updateFullPowerMove )
+        
+    def updateFullPowerMove(self):
+        self.fullPowerUi.setPrm1 ( App.character.getBattleMove() )
+        self.fullPowerUi.setTotal( App.character.getFullPowerMove() )
     
 class SubAbilityItem(ft.UserControl):
     """ HP最大値など """
@@ -807,8 +847,6 @@ class SubAbilityItem(ft.UserControl):
         self.total = ft.TextField( value=0, read_only=True )
         self.total.width = self.prmWidth
 
-        # callback
-    
     def build(self):
         prm1Frame = ft.Column([ self.prm1Str, self.prm1Field ], width=self.prmWidth )
         prm2Frame = ft.Column([ self.prm2Str, self.prm2Field ], width=self.prmWidth )
@@ -830,6 +868,18 @@ class SubAbilityItem(ft.UserControl):
             ], ),
             bgcolor=ft.colors.BLUE_50,
         )
+    
+    def setPrm1(self, value : int):
+        self.prm1Field.value = value
+        self.prm1Field.update()
+
+    def setPrm2(self, value : int):
+        self.prm2Field.value = value
+        self.prm2Field.update()
+
+    def setTotal(self, value : int):
+        self.total.value = value
+        self.total.update()
 
 # ###############################################################################################
 class AbilityUi(ft.UserControl):

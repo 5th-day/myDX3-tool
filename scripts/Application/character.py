@@ -453,7 +453,7 @@ class DX3Character(object):
     # 全力移動
     def _updateFullPowerMove(self) -> None :
         # set prm
-        self.__prm.subAbility.fullPowerMove = self.getMovePoint() * 2
+        self.__prm.subAbility.fullPowerMove = self.getBattleMove() * 2
         # notify prm change
         self.__observers[ePrmId.fullPowerMove].notify()
     
