@@ -615,7 +615,7 @@ class Personality(object):
         # instance vars
         self.name : str      = ""
         self.codeName        = ""
-        self.works : eWorks  = 0
+        self.works : eWorks  = eWorks.Empty
         self.cover           = ""
         self.age             = 0
         self.gender          = ""

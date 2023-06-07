@@ -58,6 +58,7 @@ class ePrmId(IntEnum):
 # ################################################################################################
 @unique
 class eWorks(IntEnum):
+    Empty                     = auto() # 空白
     ElementarySchoolStudent   = auto() # 小学生
     MiddleSchoolStudent       = auto() # 中学生
     HighSchoolStudent         = auto() # 高校生
@@ -133,6 +134,7 @@ class Works :
     """ 職業 class """
     # IDとパラメータを辞書型で管理する
     prm = {
+        eWorks.Empty                     : WorksPrm( dispName=" "                , factor=""    , skills=["-", "-", "-", "-", "-", ] ),
         eWorks.ElementarySchoolStudent   : WorksPrm( dispName="小学生"           , factor="感覚", skills=["知覚（２）", "意志", "RC", "情報：噂話", "-", ] ),
         eWorks.MiddleSchoolStudent       : WorksPrm( dispName="中学生"           , factor="感覚", skills=["", "", "", "", "", ] ),
         eWorks.HighSchoolStudent         : WorksPrm( dispName="高校生"           , factor="肉体", skills=["", "", "", "", "", ] ),
