@@ -465,12 +465,21 @@ class DX3Character(object):
     def setBleed(self, bleed: eBleed) -> None:
         # set prm
         self.__prm.bleed = bleed
-        
         # notify prm change
         self.__observers[ePrmId.bleed].notify()
         
         # update 能力値
         self._updateAbilityValue()
+        
+        if bleed == eBleed.pureBleed :
+            # ピュアブリードは１つ目のシンドローム以外を解除
+            self.setSyndrome(target=2,          syndrome=eSyndrome.empty)
+            self.setSyndrome(target="optional", syndrome=eSyndrome.empty)
+        elif bleed == eBleed.crossBleed :
+            # クロスブリードはオプショナルシンドロームを解除
+            self.setSyndrome(target="optional", syndrome=eSyndrome.empty)
+        else :
+            pass
         
     def getBleed(self) -> eBleed :
         return self.__prm.bleed

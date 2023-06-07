@@ -47,7 +47,7 @@ class ePrmId(IntEnum):
     mentalSkillPoint      = auto()
     socialitySkillPoint   = auto()
     bleed                 = auto()
-    syndrome              = auto()
+    syndrome1             = auto()
     syndrome2             = auto()
     optionalSyndrome      = auto()
     effect                = auto()
@@ -780,10 +780,10 @@ class Bleed :
     }
 
     @classmethod
-    def getPrm( cls, id : eArousal ) :
+    def getPrm( cls, id : eBleed ) :
         return cls.prm[id]
     @classmethod
-    def getDispName( cls, id : eArousal ) :
+    def getDispName( cls, id : eBleed ) :
         return cls.prm[id].dispName
 
 # ################################################################################################
@@ -822,7 +822,7 @@ class Syndrome :
     """ シンドローム class """
     # IDとパラメータを辞書型で管理する
     prm = {
-        eSyndrome.empty      : SyndromePrm( dispName=""                   , bodyVal = 0, senseVal = 0, mentalVal = 0, socialityVal = 0 ),
+        eSyndrome.empty      : SyndromePrm( dispName=" "                  , bodyVal = 0, senseVal = 0, mentalVal = 0, socialityVal = 0 ),
         eSyndrome.angelHalo  : SyndromePrm( dispName="エンジェルハィロゥ" , bodyVal = 0, senseVal = 3, mentalVal = 1, socialityVal = 0 ),
         eSyndrome.balor      : SyndromePrm( dispName="バロール"           , bodyVal = 0, senseVal = 1, mentalVal = 3, socialityVal = 1 ),
         eSyndrome.blackDog   : SyndromePrm( dispName="ブラックドッグ"     , bodyVal = 2, senseVal = 1, mentalVal = 1, socialityVal = 0 ),

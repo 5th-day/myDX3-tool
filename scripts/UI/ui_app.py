@@ -1,5 +1,6 @@
 # coding: UTF-8
 
+from typing import Literal
 import flet as ft
 
 from Application.character_attributes import *
@@ -776,7 +777,7 @@ class SubAbilityUi(ft.UserControl):
         
     def updateMaxHp(self):
         self.maxHpUi.setPrm1 ( App.character.getBodyValue() )
-        self.maxHpUi.setPrm2 ( App.character.getBodyValue() )
+        self.maxHpUi.setPrm2 ( App.character.getMentalValue() )
         self.maxHpUi.setTotal( App.character.getMaxHp() )
     
     def __initRegularStockUi(self):
@@ -1089,7 +1090,20 @@ class BleedUi(ft.UserControl):
     def __initBleedSelBox(self):
         self.bleedSelBox = ft.Dropdown()
         
-        self.bleedSelBox.options.append( ft.dropdown.Option(" "))
+        # dropdown itemの登録
+        for id in eBleed :
+            self.bleedSelBox.options.append( ft.dropdown.Option(key=id, text=Bleed.getDispName(id) ) )
+
+        # callback
+        self.bleedSelBox.on_change = lambda e: App.character.setBleed( int(e.control.value) )
+        
+        # observer に登録
+        App.character.bind( id=ePrmId.bleed, callback=self.update )
+        
+    def update(self):
+        self.bleedSelBox.value = App.character.getBleed()
+        self.bleedSelBox.update()
+        
     
 class SyndromeUi(ft.UserControl):
     """ シンドローム """
@@ -1121,9 +1135,9 @@ class SyndromeUi(ft.UserControl):
         self.syndromeStr = ft.Text("シンドローム")
         
     def __initSyndromItems(self):
-        self.syndromeItem1 = SyndromeItem()
-        self.syndromeItem2 = SyndromeItem()
-        self.syndromeItem3 = SyndromeItem()
+        self.syndromeItem1 = SyndromeItem(syndromeId=1)
+        self.syndromeItem2 = SyndromeItem(syndromeId=2)
+        self.syndromeItem3 = SyndromeItem(syndromeId=3)
         
         self.syndromeItem3.selBox.label = "optional"
         
@@ -1135,24 +1149,75 @@ class SyndromeUi(ft.UserControl):
         
 class SyndromeItem(ft.UserControl):
     """ シンドローム """
-    def __init__(self):
+    def __init__(self, syndromeId : Literal[1,2,3] ):
         super().__init__()
-        # define
+        # vars
+        self.syndromeId = syndromeId
         
         # init
         self.__initSyndromeItem()
 
-        # callback
+        # observerに登録
+        match self.syndromeId :
+            case 1 :
+                bindId = ePrmId.syndrome1
+            case 2 :
+                bindId = ePrmId.syndrome2
+            case 3 :
+                bindId = ePrmId.optionalSyndrome
+            case _ :
+                print( "syndromeNum Error" )
+        App.character.bind(id=bindId, callback=self.update)
+        # Bleedが更新されたときにも通知を受ける
+        App.character.bind(id=ePrmId.bleed, callback=self.update)
     
+        self.target = "optional" if self.syndromeId == 3 else self.syndromeId
+        
     def build(self):
         return self.selBox
     
     def __initSyndromeItem(self):
         self.selBox = ft.Dropdown()
         
-        self.selBox.options.append(ft.dropdown.Option(" ") )
+        for id in eSyndrome :
+            self.selBox.options.append(ft.dropdown.Option( key=id, text=Syndrome.getDispName(id) ) )
         
+        # callback
+        self.selBox.on_change = self.onChange
+        
+        flg = self.isToBeDisable( App.character.getBleed() )
+        self.selBox.disabled = flg
+        
+    def update(self) :
+        self.selBox.value = App.character.getSyndrome(target=self.target)
+        
+        # ブリードが変わった場合
+        flg = self.isToBeDisable( App.character.getBleed() )
+        self.selBox.disabled = flg
+        
+        self.selBox.update()
     
+    def isToBeDisable(self, bleedId : eBleed) -> bool :
+        flg = False
+        
+        match self.syndromeId :
+            case 1 :
+                pass
+            case 2 :
+                # synderom 2 は ピュアブリードのとき Disable
+                if bleedId == eBleed.pureBleed :
+                    flg = True
+            case 3 :
+                # optional syndrome は トライブリードでないとき Disable
+                if not bleedId == eBleed.triBleed  :
+                    flg = True
+            case _ :
+                pass
+        return flg
+    
+    def onChange(self, e):
+        App.character.setSyndrome(target = self.target, syndrome = int(e.control.value) )
+        
 
 # ###############################################################################################
 
