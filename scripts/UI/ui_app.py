@@ -563,12 +563,16 @@ class LifepathUi(ft.UserControl):
         self.experience.update()
         
     def updateExperience(self):
-        # 経験表 Dropdownの更新
-        # self.experienceList.setValue( App.character.getExperienceList() )
-        self.experienceList.update()
-        # 経験 Dropdownの更新
-        self.updateExperienceItems( int(self.experienceList.getValue()) )
-        self.experience.setValue( App.character.getExperience() )
+        experienceListId, experienceId = App.character.getExperience()
+        
+        if ( experienceListId != int(self.experienceList.getValue()) ) :
+            # 経験表 Dropdownの更新
+            self.experienceList.setValue( experienceListId )
+            self.experienceList.update()
+            # 経験 Dropdownの更新
+            self.updateExperienceItems( int(self.experienceList.getValue()) )
+        else :
+            self.experience.setValue( int(experienceId) )
         self.experience.update()
         
     def __initEncount(self):
@@ -628,6 +632,7 @@ class LifepathUi(ft.UserControl):
         App.character.setBirthPlace( int(e.control.value) )
         
     def experienceListOnChange(self,e):
+        # 経験 Dropdownの更新
         self.updateExperienceItems( int(e.control.value) )
         
     def experienceOnChanged(self, e):
