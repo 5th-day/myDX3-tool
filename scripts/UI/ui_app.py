@@ -1,10 +1,11 @@
 # coding: UTF-8
 
-from typing import Literal
+from typing import Literal, Callable
 import flet as ft
 
 from Application.character_attributes import *
-from Application.character import DX3Character
+from Application.character import DX3Character, SkillPrm
+
 
 # ##############################################################################################3#
 class App:
@@ -913,6 +914,7 @@ class AbilityUi(ft.UserControl):
                         self.mentalUi,
                         self.socialityUi
                     ],
+                    vertical_alignment=ft.CrossAxisAlignment.START,
                 ),
             ],),
             # width=self.containerWidth,
@@ -936,10 +938,10 @@ class AbilityUi(ft.UserControl):
     
 class AbilityItemUi(ft.UserControl):
     """ 技能パラメータ """
-    def __init__(self, abilityStr: str, ):
+    def __init__(self, abilityStr: str):
         super().__init__()
         # define
-        self.containerWidth = 250
+        self.containerWidth = 300
         self.pointWidth = 60
         # vars
         self.abilityStr     = abilityStr
@@ -948,13 +950,25 @@ class AbilityItemUi(ft.UserControl):
         self.freePoint      = 0
         self.skillList      = []
         
+        # スキルリストをDX3characterから取得
+        self.updateSkillList()
+        
+        self.skillAppendIcon = ft.IconButton(icon=ft.icons.ADD, tooltip="技能追加")
+        
         self.abilityStrText    = ft.Text( self.abilityStr )
         self.abilityPointField = ft.TextField( value=self.abilityPoint, width=self.pointWidth ,read_only=True )
         self.freePointSpace    = ft.Text( self.freePointSpace,)
         self.freePointField    = ft.TextField( value=self.freePoint, width=self.pointWidth, label="成長P")
         
+        self.skillRows         = ft.Column(self.skillList)
+        
         # callback
-    
+        self.setSkillAppendIconOnClick( self.appendSkill )
+        
+        # observerに登録
+        observerId : ePrmId = App.character.getSkillObserverId(self.abilityStr)
+        App.character.bind(observerId, self.updateSkills)
+        
     def build(self):
         return ft.Container(
             content=ft.Column(
@@ -972,25 +986,88 @@ class AbilityItemUi(ft.UserControl):
                             ),
                         ],
                     ),
-                    ft.Column(self.skillList),
+                    self.skillRows,
+                    self.skillAppendIcon,
                 ],
             ),
             width=self.containerWidth,
         )
     
+    def updateAbilityPoint(self, point : int ) :
+        """ 能力値の更新 """
+        self.abilityPointField.value = point
+        self.abilityPointField.update()
+        
+    def updateAbilityFreePoint(self, point : int)  :
+        """ 能力値の成長ポイントの更新 """
+        self.freePointField.value = point
+        self.freePointField.update()
+    
+    def setAbilityFreePointOnChange(self, callback : Callable[[], None] ) -> None :
+        self.freePointField.on_blur = callback
+    
+    def setSkillAppendIconOnClick(self, callback : Callable[[], None] ) -> None :
+        self.skillAppendIcon.on_click = callback
+    
+    def appendSkill(self, e) :
+        """ スキルの追加 """
+        App.character.appendSkill(self.abilityStr)
+        
+        self.updateSkills()
+        
+    def updateSkillList(self) :
+        """ スキルリストの更新 """
+        # 既存のリストのクリア
+        self.skillList.clear()
+        # スキルリストの取得
+        skillList : list[SkillPrm]= App.character.getSkillList(ability=self.abilityStr)
+        
+        index = 0
+        # リストにスキル追加
+        for skill in skillList :
+            self.skillList.append( 
+                SkillItemUi(
+                    abilityStr   = self.abilityStr,
+                    skillStr     = skill.type,
+                    index        = index,
+                    hasTextField = skill.existSpecific,
+                    specificStr  = skill.specific,
+                    freePoint    = skill.growth,
+                    level        = skill.level,
+                    deletable    = skill.deletable,
+                )
+            )
+            index += 1
+        
+    def updateSkills(self) :
+        """ スキルの更新（observerに登録するコールバック）"""
+        self.updateSkillList()
+        self.skillRows.update()
+        
+
     
 class AbilityBodyUi(AbilityItemUi):
     """ 肉体UI """
     def __init__(self):
-        super().__init__(abilityStr = "肉体")
+        super().__init__(abilityStr = "肉体" )
         # define
         
         # vars
-        self.skillList.append( SkillItemUi("白兵") )
-        self.skillList.append( SkillItemUi("回避") )
-        self.skillList.append( SkillItemUi("運転", hasTextField=True) )
-
+        
         # callback
+        self.setAbilityFreePointOnChange( callback=lambda e: App.character.setBodyGrowthPoint( int(e.control.value) ) )
+        
+        # observerに登録
+        App.character.bind(id = ePrmId.bodyPoint      , callback= self.updateBodyPoint     )
+        App.character.bind(id = ePrmId.bodyGrowthPoint, callback= self.updateBodyFreePoint )
+        # App.character.bind(id = ePrmId.bodySkillPoint , callback= None )
+    
+    def updateBodyPoint(self):
+        self.updateAbilityPoint( App.character.getBodyValue() )
+    
+    def updateBodyFreePoint(self):
+        self.updateAbilityFreePoint( App.character.getBodyGrowthPoint() )
+    
     
 class AbilitySenseUi(AbilityItemUi):
     """ 感覚UI """
@@ -999,11 +1076,20 @@ class AbilitySenseUi(AbilityItemUi):
         # define
         
         # vars
-        self.skillList.append( SkillItemUi("射撃") )
-        self.skillList.append( SkillItemUi("知覚") )
-        self.skillList.append( SkillItemUi("芸術", hasTextField=True) )
-
+        
         # callback
+        self.setAbilityFreePointOnChange( callback=lambda e: App.character.setSenseGrowthPoint( int(e.control.value) ) )
+        
+        # observerに登録
+        App.character.bind(id = ePrmId.sensePoint      , callback= self.updateSensePoint     )
+        App.character.bind(id = ePrmId.senseGrowthPoint, callback= self.updateSenseFreePoint )
+    
+    def updateSensePoint(self):
+        self.updateAbilityPoint( App.character.getSenseValue() )
+    
+    def updateSenseFreePoint(self):
+        self.updateAbilityFreePoint( App.character.getSenseGrowthPoint() )    
+    
     
 class AbilityMentalUi(AbilityItemUi):
     """ 精神UI """
@@ -1012,12 +1098,21 @@ class AbilityMentalUi(AbilityItemUi):
         # define
         
         # vars
-        self.skillList.append( SkillItemUi("RC") )
-        self.skillList.append( SkillItemUi("意志") )
-        self.skillList.append( SkillItemUi("知識", hasTextField=True) )
 
         # callback
+        self.setAbilityFreePointOnChange( callback=lambda e: App.character.setMentalGrowthPoint( int(e.control.value) ) )
+        
+        # observerに登録
+        App.character.bind(id = ePrmId.mentalPoint      , callback= self.updateMentalPoint     )
+        App.character.bind(id = ePrmId.mentalGrowthPoint, callback= self.updateMentalFreePoint )
     
+    def updateMentalPoint(self):
+        self.updateAbilityPoint( App.character.getMentalValue() )
+    
+    def updateMentalFreePoint(self):
+        self.updateAbilityFreePoint( App.character.getMentalGrowthPoint() )    
+    
+   
 class AbilitySocialityUi(AbilityItemUi):
     """ 社会UI """
     def __init__(self):
@@ -1025,32 +1120,49 @@ class AbilitySocialityUi(AbilityItemUi):
         # define
         
         # vars
-        self.skillList.append( SkillItemUi("交渉") )
-        self.skillList.append( SkillItemUi("調達") )
-        self.skillList.append( SkillItemUi("情報", hasTextField=True) )
 
         # callback
+        self.setAbilityFreePointOnChange( callback=lambda e: App.character.setSocialityGrowthPoint( int(e.control.value) ) )
+        
+        # observerに登録
+        App.character.bind(id = ePrmId.socialityPoint      , callback= self.updateSocialityPoint     )
+        App.character.bind(id = ePrmId.socialityGrowthPoint, callback= self.updateSocialityFreePoint )
     
-
+    def updateSocialityPoint(self):
+        self.updateAbilityPoint( App.character.getSocialityValue() )
+    
+    def updateSocialityFreePoint(self):
+        self.updateAbilityFreePoint( App.character.getSocialityGrowthPoint() )    
+    
+   
 class SkillItemUi(ft.UserControl):
     """ 技能パラメータ """
-    def __init__(self, str : str, hasTextField : bool = False, ):
+    def __init__(self, abilityStr : str, skillStr : str, index : int, hasTextField : bool = False, specificStr : str = "", freePoint : float = 0, level : int = 0, deletable : bool = False ):
         super().__init__()
         # define
         
         # vars
-        self.str          = str
-        self.level        = 0
-        self.freePoint    = 0
+        self.abilityStr   = abilityStr
+        self.skillStr     = skillStr
+        self.index        = index   # スキルリストのインデックス
+        self.level        = level
+        self.freePoint    = freePoint
         self.hasTextField = hasTextField
+        self.specificStr  = specificStr
+        self.deletable    = deletable
         
-        self.strText        = ft.Text(self.str)
-        self.levelField     = ft.TextField(value=0, keyboard_type=ft.KeyboardType.NUMBER, read_only=True, suffix_text="Lv")
-        self.freePointField = ft.TextField(value=0, keyboard_type=ft.KeyboardType.NUMBER, suffix_text="P", label="成長P")
+        self.strText        = ft.Text(self.skillStr)
+        self.levelField     = ft.TextField(value=self.level    , keyboard_type=ft.KeyboardType.NUMBER, read_only=True, suffix_text="Lv")
+        self.freePointField = ft.TextField(value=self.freePoint, keyboard_type=ft.KeyboardType.NUMBER, suffix_text="P", label="成長P")
         
-        self.specificField   = ft.TextField(value="")
+        self.specificField   = ft.TextField(value=self.specificStr)
+        
+        self.skillDeleteIcon = ft.IconButton(icon=ft.icons.DELETE, tooltip="削除")
         
         # callback
+        self.specificField.on_blur    = self.specificFieldOnChange
+        self.freePointField.on_blur   = self.freePointFieldOnChange
+        self.skillDeleteIcon.on_click = self.skillDeleteIconOnClick
     
     def build(self):
         if self.hasTextField :
@@ -1061,11 +1173,22 @@ class SkillItemUi(ft.UserControl):
             row = [self.strText, self.freePointField, self.levelField ]
             # 一旦適当な幅で調整しておく
             self.strText.width = 100
+        
+        if self.deletable :
+            row.append( self.skillDeleteIcon )
             
         # 一旦適当な幅で調整しておく
         self.levelField.width = self.freePointField.width = 60
         return ft.Row( row )
+    
+    def specificFieldOnChange(self, e) :
+        App.character.setSpecificSkillStr( ability=self.abilityStr, index=self.index, str=e.control.value )
          
+    def freePointFieldOnChange(self, e) :
+        App.character.setSkillGrowthPoint( ability=self.abilityStr, index=self.index, point=float(e.control.value) )
+
+    def skillDeleteIconOnClick(self, e) :
+        App.character.deleteSkill(ability=self.abilityStr, index=self.index)
 
 # ###############################################################################################
 class BleedUi(ft.UserControl):

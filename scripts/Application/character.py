@@ -324,6 +324,22 @@ class DX3Character(object):
         # 行動値
         self._updateMovePoint()
         
+    # 能力値
+    def _getAbilityPrm(self, ability : Literal["肉体", "感覚", "精神", "社会"] ) :
+        """ ability instanceを返す """
+        match ability :
+            case "肉体" :
+                return self.__prm.ability.body
+            case "感覚" :
+                return self.__prm.ability.sense
+            case "精神" :
+                return self.__prm.ability.mental
+            case "社会" :
+                return self.__prm.ability.sociality
+            case _ :
+                print("invalid ability str")
+                return None
+        
     # 肉体値
     def getBodyValue(self) -> int :
         return self.__prm.ability.body.val
@@ -384,6 +400,93 @@ class DX3Character(object):
     def getSocialityGrowthPoint(self) -> int :
         return self.__prm.ability.sociality.growth
     
+    # ################　技能値　#########################
+    def getSkillObserverId(self, ability : Literal["肉体", "感覚", "精神", "社会"] ) -> ePrmId :
+        """ ePrmIdを返す """
+        match ability :
+            case "肉体" :
+                return ePrmId.bodySkills
+            case "感覚" :
+                return ePrmId.senseSkills
+            case "精神" :
+                return ePrmId.mentalSkills
+            case "社会" :
+                return ePrmId.socialitySkills
+            case _ :
+                print("invalid ability str")
+                return None
+        
+    def _notifySkillChange(self, ability : Literal["肉体", "感覚", "精神", "社会"] ) :
+        id = self.getSkillObserverId( ability=ability )
+        self.__observers[id].notify()
+    
+    def getSkillList(self, ability : Literal["肉体", "感覚", "精神", "社会"] ) -> list :
+        """ 各能力値に属するスキルのリストを取得する """
+        abilityPrm : AbilityPrm = self._getAbilityPrm(ability=ability)
+        return abilityPrm.skillList
+    
+    def appendSkill(self, ability : Literal["肉体", "感覚", "精神", "社会"] ) -> None :
+        """ スキルを追加
+            追加されるスキルは文字入力可能で削除可能。
+        """
+        abilityPrm : AbilityPrm = self._getAbilityPrm(ability=ability)
+        extraSkillStr = abilityPrm.extraSkillStr
+        abilityPrm.skillList.append( SkillPrm( type=extraSkillStr, existSpecific=True, deletable=True ) )
+        # notify prm change
+        self._notifySkillChange(ability=ability)
+    
+    def deleteSkill(self, ability : Literal["肉体", "感覚", "精神", "社会"], index : int ) :
+        """ index番目のスキルを削除"""
+        skillList : list = self.getSkillList(ability=ability)
+        
+        if skillList[ index ].deletable :
+            skillList.pop(index)
+        
+        # notify prm change
+        self._notifySkillChange(ability=ability)
+    
+    def setSpecificSkillStr(self, ability : Literal["肉体", "感覚", "精神", "社会"], index : int, str : str ) :
+        """ 運転などのスキルの内容をセットする """
+        skillList : list = self.getSkillList(ability=ability)
+        skillPrm : SkillPrm = skillList[ index ]
+        if not skillPrm.existSpecific :
+            return
+        skillPrm.specific = str
+        # notify prm change
+        self._notifySkillChange(ability=ability)
+        
+    def updateSkillPoint(self, ability : Literal["肉体", "感覚", "精神", "社会"], index : int ) :
+        """ 技能値の更新 """
+        skillList : list = self.getSkillList(ability=ability)
+        skillPrm : SkillPrm = skillList[ index ]
+        
+        if not skillPrm.existSpecific :
+            growth = skillPrm.growth
+        else :
+            growth = skillPrm.growth * 2
+            
+        skillPrm.level = int( skillPrm.worksP + growth )
+        
+        # notify prm change
+        self._notifySkillChange(ability=ability)
+        
+    def setSkillGrowthPoint(self, ability : Literal["肉体", "感覚", "精神", "社会"], index : int, point : float ) :
+        """ スキルの成長Pをセットする """
+        if type(point) is not float :
+            point = float(point)
+        
+        skillList : list = self.getSkillList(ability=ability)
+        skillPrm : SkillPrm = skillList[ index ]
+        
+        # if not skillPrm.existSpecific :
+        #     skillPrm.growth = point
+        # else :
+        #     skillPrm.growth = point * 2 )
+        skillPrm.growth = point
+        
+        # 技能値の更新
+        self.updateSkillPoint(ability=ability, index=index)
+        
     # ################　副能力値　#########################
     # HP最大値
     def _updateMaxHp(self) -> None :
@@ -682,41 +785,55 @@ class AbilityPrm(object):
         self.growth = 0
         
         self.skillList = []
+        
+        self.extraSkillStr = ""
     
     def __del__(self) :
         pass
-
+    
 class AbilityBodyPrm(AbilityPrm):
     def __init__(self) -> None:
         super().__init__()
         
+        self.extraSkillStr = "運転"
+        
         self.skillList.append( SkillPrm("白兵"))
         self.skillList.append( SkillPrm("回避"))
-        self.skillList.append( SkillPrm("運転"))
+        self.skillList.append( SkillPrm("運転", existSpecific=True))
+        self.skillList.append( SkillPrm("運転", existSpecific=True))
 
 class AbilitySensePrm(AbilityPrm):
     def __init__(self) -> None:
         super().__init__()
         
+        self.extraSkillStr = "芸術"
+        
         self.skillList.append( SkillPrm("射撃"))
         self.skillList.append( SkillPrm("知覚"))
-        self.skillList.append( SkillPrm("芸術"))
+        self.skillList.append( SkillPrm("芸術", existSpecific=True))
+        self.skillList.append( SkillPrm("芸術", existSpecific=True))
 
 class AbilityMentalPrm(AbilityPrm):
     def __init__(self) -> None:
         super().__init__()
         
+        self.extraSkillStr = "知識"
+        
         self.skillList.append( SkillPrm("RC"))
         self.skillList.append( SkillPrm("意志"))
-        self.skillList.append( SkillPrm("知識"))
+        self.skillList.append( SkillPrm("知識", existSpecific=True))
+        self.skillList.append( SkillPrm("知識", existSpecific=True))
 
 class AbilitySocialityPrm(AbilityPrm):
     def __init__(self) -> None:
         super().__init__()
         
+        self.extraSkillStr = "情報"
+        
         self.skillList.append( SkillPrm("交渉"))
         self.skillList.append( SkillPrm("調達"))
-        self.skillList.append( SkillPrm("情報"))
+        self.skillList.append( SkillPrm("情報", existSpecific=True))
+        self.skillList.append( SkillPrm("情報", existSpecific=True))
 
 class SubAbility(object):
     def __init__(self) -> None:
@@ -729,12 +846,14 @@ class SubAbility(object):
 
 class SkillPrm(object):
     """ スキルに関するクラス """
-    def __init__(self, type : str, specific : str = "") -> None:
+    def __init__(self, type : str, existSpecific : bool = False, specific : str = "", deletable : bool = False ) -> None:
         self.type   = type
-        self.specific = specific
+        self.existSpecific = existSpecific
+        self.specific  = specific
+        self.deletable = deletable
         self.growth = 0
+        self.worksP = 0
         self.level  = 0
-        
     
     def __del__(self) :
         pass
